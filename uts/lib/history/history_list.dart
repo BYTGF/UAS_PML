@@ -2,9 +2,9 @@
 // import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:uts/history_add.dart';
+import 'package:uts/history/history_add.dart';
 
-import 'db_manager.dart';
+import '/db_manager.dart';
 
 class HistoryList extends StatefulWidget {
   const HistoryList({Key? key}) : super(key: key);

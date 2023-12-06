@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:uts/item_add.dart';
-import 'package:uts/item_edit.dart';
+import 'package:uts/item/item_add.dart';
+import 'package:uts/item/item_edit.dart';
 
-import 'db_manager.dart';
+import '/db_manager.dart';
 
 class ItemList extends StatefulWidget {
   const ItemList({Key? key}) : super(key: key);
@@ -24,6 +24,10 @@ class _ItemListState extends State<ItemList> {
       return Icon(
           Icons.warning); // Replace with another icon for negative quantity
     }
+  }
+
+  void _insertCallback() {
+    _query(); // Refresh the list after insertion
   }
 
   @override
@@ -50,7 +54,7 @@ class _ItemListState extends State<ItemList> {
                           child: Container(
                               height: 400,
                               child: Center(
-                                child: AddItem(),
+                                child: AddItem(insertCallback: _insertCallback),
                               )));
                     },
                   );

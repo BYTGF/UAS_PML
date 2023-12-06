@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:uts/colors.dart';
-import 'package:uts/storage_edit.dart';
+import 'package:uts/storage/storage_edit.dart';
 
-import 'db_manager.dart';
+import '/db_manager.dart';
 
 class StorageList extends StatefulWidget {
   const StorageList({Key? key}) : super(key: key);

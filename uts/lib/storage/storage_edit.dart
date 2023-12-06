@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:uts/colors.dart';
 
-import 'db_manager.dart';
+import '/db_manager.dart';
 
 class EditStorage extends StatefulWidget {
   final int id;
@@ -60,7 +60,7 @@ class _EditStorageState extends State<EditStorage> {
                             borderSide: BorderSide(
                                 color: MyColors.primaryColor, width: 1.0),
                           ),
-                          hintText: 'Add Storage',
+                          hintText: 'Edit Storage',
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 10, vertical: 5),
                         ),

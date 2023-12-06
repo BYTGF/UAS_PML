@@ -3,11 +3,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'colors.dart';
-import 'db_manager.dart';
+import '/colors.dart';
+import '/db_manager.dart';
 
 class AddItem extends StatefulWidget {
-  const AddItem({Key? key}) : super(key: key);
+  final Function insertCallback;
+
+  AddItem({required this.insertCallback});
 
   @override
   _AddItemState createState() => _AddItemState();
@@ -163,26 +165,31 @@ class _AddItemState extends State<AddItem> {
   }
 
   void _insert() async {
-    int quantity = int.parse(_itemQty.text);
+    try {
+      int quantity = int.parse(_itemQty.text);
 
-    // row to insert
-    Map<String, dynamic> row = {
-      DatabaseHelper.columnName: _itemName.text,
-      DatabaseHelper.columnStorage: currentStorage,
-      DatabaseHelper.columnQty: quantity,
-      // DatabaseHelper.columnProfile: base64image,
-    };
-    print('insert stRT');
-    if (allStorageID.isNotEmpty) {
-      currentStorage = allStorageID[0];
-    }
+      Map<String, dynamic> row = {
+        DatabaseHelper.columnName: _itemName.text,
+        DatabaseHelper.columnStorage: currentStorage,
+        DatabaseHelper.columnQty: quantity,
+      };
 
-    final id = await dbHelper.insertItem(row);
-    if (kDebugMode) {
-      print('inserted row id: $id');
+      if (allStorageID.isNotEmpty) {
+        currentStorage = allStorageID[0];
+      }
+
+      final id = await dbHelper.insertItem(row);
+      if (kDebugMode) {
+        print('inserted row id: $id');
+      }
+
+      widget.insertCallback(); // Call the callback function from ItemList
+      Navigator.of(context).pop();
+      _queryStorage();
+    } catch (e) {
+      print('Error inserting item: $e');
+      // Handle the error as needed
     }
-    Navigator.of(context).pop();
-    _queryStorage();
   }
 
   void _queryStorage() async {
@@ -196,9 +203,6 @@ class _AddItemState extends State<AddItem> {
 
       categoryMap[element["_id"]] = element["name"];
     }
-
-    print(allStorageID);
-    print(allStorageName);
     setState(() {});
   }
 }

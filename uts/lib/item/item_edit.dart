@@ -1,39 +1,34 @@
 // ignore_for_file: prefer_const_constructors
 
-// import 'dart:convert';
-// import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'colors.dart';
-import 'db_manager.dart';
+import '/colors.dart';
+import '/db_manager.dart';
 
 
-class AddHistory extends StatefulWidget {
-  const AddHistory({Key? key}) : super(key: key);
+class EditItem extends StatefulWidget {
+  const EditItem({Key? key}) : super(key: key);
 
   @override
-  _AddHistoryState createState() => _AddHistoryState();
+  _EditItemState createState() => _EditItemState();
 }
 
-class _AddHistoryState extends State<AddHistory> {
-  String? selectedStatus;
-  final TextEditingController _historyQty = TextEditingController();
+class _EditItemState extends State<EditItem> {
+  final TextEditingController _itemName = TextEditingController();
+  final TextEditingController _storageName = TextEditingController();
+  final TextEditingController _itemQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
-  int currentItem = 0;
-  List<int> allItemID = [];
-  List<String> allItemName = [];
-  Map<int, String> itemMap = {};
+  int currentStorage = 0;
+  List<int> allStorageID = [];
+  List<String> allStorageName = [];
   final dbHelper = DatabaseHelper.instance;
 
-// INITIALIZE. RESULT IS A WIDGET, SO IT CAN BE DIRECTLY USED IN BUILD METHOD
 
   @override
   void initState() {
     super.initState();
     _query();
-    currentItem = 1;
   }
 
   @override
@@ -44,8 +39,9 @@ class _AddHistoryState extends State<AddHistory> {
         appBar: AppBar(
           backgroundColor: MyColors.primaryColor,
           centerTitle: true,
-          title: Text("Add History"),
+          title: Text("Edit Item"),
         ),
+        
         body: 
             SizedBox(
               child: Padding(
@@ -58,17 +54,46 @@ class _AddHistoryState extends State<AddHistory> {
                       SizedBox(
                         height: 20,
                       ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                                color: Colors.greenAccent, width: 2.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                                color: MyColors.primaryColor, width: 1.0),
+                          ),
+                          hintText: 'Item Name',
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        ),
+                        controller: _itemName,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Enter Item Name';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: MyColors.primaryColor),
                         ),
-                        child:DropdownButtonHideUnderline(
+                        child: DropdownButtonHideUnderline(
                           child: DropdownButton<int>(
                             isExpanded: true,
-                            items: itemMap.entries.map((entry) {
-                              int id = entry.key;
-                              String name = entry.value;
+                            items: allStorageID.asMap().entries.map((entry) {
+                              int index = entry.key;
+                              int id = entry.value;
+                              String name = allStorageName[index];
                               return DropdownMenuItem<int>(
                                 value: id,
                                 child: Text(name),
@@ -76,42 +101,13 @@ class _AddHistoryState extends State<AddHistory> {
                             }).toList(),
                             onChanged: (selectedID) {
                               setState(() {
-                                currentItem = selectedID!;
+                                currentStorage = selectedID!;
                               });
                             },
-                            hint: Text("Select Item"),
-                            value: currentItem,
+                            hint: Text("Select Storage"),
+                            value: currentStorage,
                           ),
                         )
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text('Status: '),
-                          Radio<String>(
-                            value: 'In',
-                            groupValue: selectedStatus,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedStatus = value;
-                              });
-                            },
-                          ),
-                          Text('In'),
-                          Radio<String>(
-                            value: 'Out',
-                            groupValue: selectedStatus,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedStatus = value;
-                              });
-                            },
-                          ),
-                          Text('Out'),
-                        ],
                       ),
                       SizedBox(
                         height: 20,
@@ -132,7 +128,7 @@ class _AddHistoryState extends State<AddHistory> {
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         ),
-                        controller: _historyQty,
+                        controller: _itemQty,
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -154,7 +150,7 @@ class _AddHistoryState extends State<AddHistory> {
                         child: TextButton(
                           onPressed: () {
                             if (formGlobalKey.currentState!.validate()) {
-                              _insert();
+                              _update();
                             }
                           },
                           child: const Text(
@@ -173,39 +169,34 @@ class _AddHistoryState extends State<AddHistory> {
     );
   }
 
-  void _insert() async {
-    
-    int quantity = int.parse(_historyQty.text);
+  void _update() async {
 
+    // row to insert
     Map<String, dynamic> row = {
-      DatabaseHelper.columnItem: currentItem,
-      DatabaseHelper.columnStatus: selectedStatus,
-      DatabaseHelper.columnQty: quantity,
+      DatabaseHelper.columnName: _itemName.text,
+      DatabaseHelper.columnStorage: _storageName.text,
+      DatabaseHelper.columnQty: _itemQty.text,
       // DatabaseHelper.columnProfile: base64image,
     };
     print('insert stRT');
-    if (allItemID.isNotEmpty) {
-      currentItem = allItemID[0];
-    }
+    currentStorage = 0;
 
-    final id = await dbHelper.insertHistory(row);
+    final id = await dbHelper.updateItem(row);
     if (kDebugMode) {
-      print('inserted row id: $id');
+      print('updated row id: $id');
     }
-    _query();
     Navigator.of(context).pop();
+    _query();
   }
 
   void _query() async {
-    final allRows = await dbHelper.queryAllRowsItem();
+    final allRows = await dbHelper.queryAllRowsStorage();
     if (kDebugMode) {
       print('query all rows:');
     }
     for (var element in allRows) {
-      allItemID.add(element["itemId"]);
-      allItemName.add(element["itemName"]);
-
-      itemMap[element["itemId"]] = element["itemName"];
+      allStorageID.add(element["_id"]);
+      allStorageName.add(element["name"]);
     }
     setState(() {});
   }
