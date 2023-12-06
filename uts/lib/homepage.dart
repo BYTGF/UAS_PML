@@ -15,13 +15,21 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   final dbHelper = DatabaseHelper.instance;
   final formGlobalKey = GlobalKey<FormState>();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -34,6 +42,7 @@ class _HomePageState extends State<HomePage> {
           title: Text("Office Stationary Stock Monitoring"),
         ),
         body: TabBarView(
+          controller: _tabController,
           children: [
             HistoryList(),
             ItemList(),
@@ -46,6 +55,7 @@ class _HomePageState extends State<HomePage> {
             color: MyColors.primaryColor,
           ),
           child: TabBar(
+            controller: _tabController,
             tabs: [
               Tab(
                 text: 'History',
