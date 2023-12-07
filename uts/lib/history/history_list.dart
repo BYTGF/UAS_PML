@@ -1,6 +1,3 @@
-// import 'dart:convert';
-// import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:uts/history/history_add.dart';
 
@@ -21,7 +18,8 @@ class _HistoryListState extends State<HistoryList> {
     if (status == "In") {
       return Icon(Icons.check_circle);
     } else {
-      return Icon(Icons.warning); // Replace with another icon for negative quantity
+      return Icon(
+          Icons.warning); // Replace with another icon for negative quantity
     }
   }
 
@@ -39,80 +37,82 @@ class _HistoryListState extends State<HistoryList> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Show the dialog when the button is pressed
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Dialog(
-                        child: Container(
-                          height: 400,
-                          child: Center(
-                            child: AddHistory(),
-                          )              
-                        ),
-                        
-                      );
-                    },
-                  );
-                },
-                child: Text('Update Stock'),
+              Container(
+                child: Text('History'),
               ),
+              SizedBox(height: 16.0),
               Expanded(
                 child: ListView.separated(
-                  itemCount:  allHistoryData.length, // Number of ListTile items (each repeated twice)
+                  itemCount: allHistoryData.length,
                   separatorBuilder: (BuildContext context, int index) {
-                    return Divider(); // Divider widget between ListTile items
+                    return Divider();
                   },
                   itemBuilder: (_, index) {
                     var item = allHistoryData[index];
-                        return ListTile(
-                          leading: _getLeadingIcon(item['historyStatus']),
-                          title: Text("${item['itemName']}"),
-                          subtitle: Text("${item['historyQty']}"),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              IconButton(
-                                icon: Icon(
-                                  Icons.edit_note,
-                                  size: 20.0,
-                                  color: Colors.brown[900],
-                                ),
-                                onPressed: () {
-                                  //   _onDeleteItemPressed(index);
-                                },
-                              ),
-                              // IconButton(
-                              //   icon: Icon(
-                              //     Icons.delete_outline,
-                              //     size: 20.0,
-                              //     color: Colors.brown[900],
-                              //   ),
-                              //   onPressed: () {
-                              //     _delete(item['historyId']);
-                              //   },
-                              // ),
-                            ],
+                    return ListTile(
+                      leading: _getLeadingIcon(item['historyStatus']),
+                      title: Text("${item['itemName']}"),
+                      subtitle: Text("${item['historyQty']}"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(
+                              Icons.edit_note,
+                              size: 20.0,
+                              color: Colors.brown[900],
+                            ),
+                            onPressed: () {
+                              // _onDeleteItemPressed(index);
+                            },
                           ),
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Quantity : ${item['itemQty']}'),
-                                duration: const Duration(seconds: 3),
-                              ),
-                            );
-                          },
+                          // IconButton(
+                          //   icon: Icon(
+                          //     Icons.delete_outline,
+                          //     size: 20.0,
+                          //     color: Colors.brown[900],
+                          //   ),
+                          //   onPressed: () {
+                          //     _delete(item['historyId']);
+                          //   },
+                          // ),
+                        ],
+                      ),
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Quantity : ${item['itemQty']}'),
+                            duration: const Duration(seconds: 3),
+                          ),
                         );
+                      },
+                    );
                   },
                 ),
               ),
             ],
           ),
-        )
-      )
-      
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                  child: Container(
+                    height: 400,
+                    child: Center(
+                      child: AddHistory(),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+          backgroundColor: Colors.amber,
+          child: Icon(Icons.add),
+        ),
+      ),
     );
   }
 
@@ -120,8 +120,9 @@ class _HistoryListState extends State<HistoryList> {
     final allRows = await dbHelper.queryAllRowsHistory();
     print('query all rows:');
     allRows.forEach(print);
-    allHistoryData = allRows;
-    setState(() {});
+    setState(() {
+      allHistoryData = allRows;
+    });
   }
 
   void _delete(int id) async {

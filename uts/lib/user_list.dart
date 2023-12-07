@@ -23,83 +23,93 @@ class _UserListState extends State<UserList> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-            body: Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              // Show the dialog when the button is pressed
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Dialog(
-                      child: Container(
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Container(
+                child: Text('User'),
+              ),
+              SizedBox(
+                height: 16.0,
+              ),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: allUserData.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return Divider();
+                  },
+                  itemBuilder: (_, index) {
+                    var item = allUserData[index];
+                    return ListTile(
+                      leading: Icon(Icons.account_circle),
+                      title: Text("${item['username']}"),
+                      subtitle: Text("${item['date']}"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(
+                              Icons.edit_note,
+                              size: 20.0,
+                              color: Colors.brown[900],
+                            ),
+                            onPressed: () {
+                              // _onDeleteUserPressed(index);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete_outline,
+                              size: 20.0,
+                              color: Colors.brown[900],
+                            ),
+                            onPressed: () {
+                              _delete(item['_id']);
+                            },
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        // Add your onTap logic here
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Show the dialog when the button is pressed
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                  child: Container(
                     height: 350,
                     child: AddUser(),
-                  ));
-                },
-              );
-            },
-            child: Text('Add User'),
-          ),
-          Expanded(
-            child: ListView.separated(
-              itemCount: allUserData
-                  .length, // Number of ListTile items (each repeated twice)
-              separatorBuilder: (BuildContext context, int index) {
-                return Divider(); // Divider widget between ListTile items
-              },
-              itemBuilder: (_, index) {
-                var item = allUserData[index];
-                return ListTile(
-                  leading: Icon(Icons.account_circle),
-                  title: Text("${item['username']}"),
-                  subtitle: Text("${item['date']}"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(
-                          Icons.edit_note,
-                          size: 20.0,
-                          color: Colors.brown[900],
-                        ),
-                        onPressed: () {
-                          //   _onDeleteUserPressed(index);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete_outline,
-                          size: 20.0,
-                          color: Colors.brown[900],
-                        ),
-                        onPressed: () {
-                          _delete(item['_id']);
-                        },
-                      ),
-                    ],
                   ),
-                  onTap: () {
-                    // Add your onTap logic here
-                  },
                 );
               },
-            ),
-          ),
-        ],
+            );
+          },
+          backgroundColor: Colors.amber,
+          child: Icon(Icons.add),
+        ),
       ),
-    )));
+    );
   }
 
   void _query() async {
     final allRows = await dbHelper.queryAllRowsUser();
     print('query all rows:');
     allRows.forEach(print);
-    allUserData = allRows;
-    setState(() {});
+    setState(() {
+      allUserData = allRows;
+    });
   }
 
   void _delete(int id) async {
