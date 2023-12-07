@@ -15,7 +15,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   final dbHelper = DatabaseHelper.instance;
   final formGlobalKey = GlobalKey<FormState>();
   late TabController _tabController;
@@ -59,7 +60,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             tabs: [
               Tab(
                 text: 'History',
-                icon: Icon(Icons.list_outlined),
+                icon: Icon(Icons.access_alarm_rounded),
               ),
               Tab(
                 text: 'Item List',

@@ -73,21 +73,11 @@ class LoginPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
                       SizedBox(
                         width: 15,
                       ),
-                      Text("Biar Diinget"),
                     ],
                   ),
-                  Text("Lupa Sama Passwordnya Fren?")
                 ],
               ),
               SizedBox(
@@ -100,51 +90,14 @@ class LoginPage extends StatelessWidget {
                   horizontal: 20,
                 ),
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.green),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
+                    Navigator.pushNamed(context, '/home');
                   },
                   child: Text("Login Bro"),
                 ),
               ),
-              Container(
-                width: double.infinity,
-                height: 50,
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 19),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context, '/home'
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.network(
-                        "https://cdn.imgbin.com/3/12/23/imgbin-google-pSzwF41a4Xjza6ydKK0wQZgjq.jpg",
-                        height: 20,
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Text("Login Sama Google"),
-                    ],
-                  ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Belum Punya Akun Ges?"),
-                  Text("Sign Up"),
-                ],
-              )
             ],
           ),
         ),

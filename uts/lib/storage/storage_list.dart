@@ -28,21 +28,21 @@ class _StorageListState extends State<StorageList> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      
       body: Form(
         key: formGlobalKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Container(
+              margin: EdgeInsets.all(16),
+              child: Text('Storage'),
+            ),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -100,7 +100,8 @@ class _StorageListState extends State<StorageList> {
                     ),
                     Expanded(
                       child: ListView.separated(
-                        itemCount: allStorageData.length, // Number of ListTile items (each repeated twice)
+                        itemCount: allStorageData
+                            .length, // Number of ListTile items (each repeated twice)
                         separatorBuilder: (BuildContext context, int index) {
                           return Divider(); // Divider widget between ListTile items
                         },
@@ -123,16 +124,14 @@ class _StorageListState extends State<StorageList> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return Dialog(
-                                          child: Container(
-                                            height: 400,
-                                            child: Center(
-                                              child: EditStorage( 
-                                                id: item['_id'],
-                                                name: item['name'],
-                                              ),
-                                            )
-                                          )
-                                        );
+                                            child: Container(
+                                                height: 400,
+                                                child: Center(
+                                                  child: EditStorage(
+                                                    id: item['_id'],
+                                                    name: item['name'],
+                                                  ),
+                                                )));
                                       },
                                     );
                                   },
@@ -144,7 +143,7 @@ class _StorageListState extends State<StorageList> {
                                     color: Colors.brown[900],
                                   ),
                                   onPressed: () {
-                                  _delete(item['_id']);
+                                    _delete(item['_id']);
                                   },
                                 ),
                               ],

@@ -45,35 +45,20 @@ class _ItemListState extends State<ItemList> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Show the dialog when the button is pressed
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Dialog(
-                          child: Container(
-                              height: 400,
-                              child: Center(
-                                child: AddItem(insertCallback: _insertCallback),
-                              )));
-                    },
-                  );
-                },
-                child: Text('Add Items'),
+              Container(
+                child: Text('Item List'),
               ),
+              SizedBox(height: 16.0),
               Expanded(
                 child: ListView.separated(
-                  itemCount: allItemData
-                      .length, // Number of ListTile items (each repeated twice)
+                  itemCount: allItemData.length,
                   separatorBuilder: (BuildContext context, int index) {
-                    return Divider(); // Divider widget between ListTile items
+                    return Divider();
                   },
                   itemBuilder: (_, index) {
                     var item = allItemData[index];
                     return ListTile(
-                      leading: _getLeadingIcon(item[
-                          'itemQty']), // Change to your desired warning icon
+                      leading: _getLeadingIcon(item['itemQty']),
                       title: Text("${item['itemName']}"),
                       subtitle: Text("${item['storageName']}"),
                       trailing: Row(
@@ -90,11 +75,13 @@ class _ItemListState extends State<ItemList> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return Dialog(
-                                      child: Container(
-                                          height: 400,
-                                          child: Center(
-                                            child: EditItem(),
-                                          )));
+                                    child: Container(
+                                      height: 400,
+                                      child: Center(
+                                        child: EditItem(),
+                                      ),
+                                    ),
+                                  );
                                 },
                               );
                             },
@@ -126,6 +113,25 @@ class _ItemListState extends State<ItemList> {
             ],
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                  child: Container(
+                    height: 400,
+                    child: Center(
+                      child: AddItem(insertCallback: _insertCallback),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+          backgroundColor: Colors.amber,
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -134,13 +140,12 @@ class _ItemListState extends State<ItemList> {
     final allRows = await dbHelper.queryAllRowsItem();
     print('query all rows:');
     // allRows.forEach(print);
-    allItemData = allRows;
-
-    setState(() {});
+    setState(() {
+      allItemData = allRows;
+    });
   }
 
   void _delete(int id) async {
-    // Assuming that the number of rows is the id for the last row.
     final rowsDeleted = await dbHelper.deleteItem(id);
     print('deleted $rowsDeleted row(s): row $id');
     _query();
