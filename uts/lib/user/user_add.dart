@@ -137,41 +137,47 @@ class _AddUserState extends State<AddUser> {
     );
   }
 
-  void _insert() async {
-    // row to insert
-    Map<String, dynamic> row = {
-      DatabaseHelper.columnUsername: _userName.text,
-      DatabaseHelper.columnDate: _userDate.text,
+  Future<void> _queryuser() async {
 
-      // DatabaseHelper.columnProfile: base64image,
-    };
-    print('insert stRT');
-    if (alluserID.isNotEmpty) {
-      currentuser = alluserID[0];
-    }
-
-    final id = await dbHelper.insertUsers(row);
-    if (kDebugMode) {
-      print('inserted row id: $id');
-    }
-    Navigator.of(context).pop();
-    _queryuser();
   }
+  void _insert() async{
 
-  void _queryuser() async {
-    final allRows = await dbHelper.queryAllRowsUser();
-    if (kDebugMode) {
-      print('query all rows:');
-    }
-    for (var element in allRows) {
-      alluserID.add(element["_id"]);
-      alluserName.add(element["name"]);
-
-      categoryMap[element["_id"]] = element["name"];
-    }
-
-    print(alluserID);
-    print(alluserName);
-    setState(() {});
   }
+  // void _insert() async {
+  //   // row to insert
+  //   Map<String, dynamic> row = {
+  //     DatabaseHelper.columnUsername: _userName.text,
+  //     DatabaseHelper.columnDate: _userDate.text,
+
+  //     // DatabaseHelper.columnProfile: base64image,
+  //   };
+  //   print('insert stRT');
+  //   if (alluserID.isNotEmpty) {
+  //     currentuser = alluserID[0];
+  //   }
+
+  //   final id = await dbHelper.insertUsers(row);
+  //   if (kDebugMode) {
+  //     print('inserted row id: $id');
+  //   }
+  //   Navigator.of(context).pop();
+  //   _queryuser();
+  // }
+
+  // void _queryuser() async {
+  //   final allRows = await dbHelper.queryAllRowsUser();
+  //   if (kDebugMode) {
+  //     print('query all rows:');
+  //   }
+  //   for (var element in allRows) {
+  //     alluserID.add(element["_id"]);
+  //     alluserName.add(element["name"]);
+
+  //     categoryMap[element["_id"]] = element["name"];
+  //   }
+
+  //   print(alluserID);
+  //   print(alluserName);
+  //   setState(() {});
+  // }
 }

@@ -164,45 +164,51 @@ class _AddItemState extends State<AddItem> {
     );
   }
 
-  void _insert() async {
-    try {
-      int quantity = int.parse(_itemQty.text);
+  Future<void> _queryStorage() async {
 
-      Map<String, dynamic> row = {
-        DatabaseHelper.columnName: _itemName.text,
-        DatabaseHelper.columnStorage: currentStorage,
-        DatabaseHelper.columnQty: quantity,
-      };
-
-      if (allStorageID.isNotEmpty) {
-        currentStorage = allStorageID[0];
-      }
-
-      final id = await dbHelper.insertItem(row);
-      if (kDebugMode) {
-        print('inserted row id: $id');
-      }
-
-      widget.insertCallback(); // Call the callback function from ItemList
-      Navigator.of(context).pop();
-      _queryStorage();
-    } catch (e) {
-      print('Error inserting item: $e');
-      // Handle the error as needed
-    }
   }
+  void _insert() async{
 
-  void _queryStorage() async {
-    final allRows = await dbHelper.queryAllRowsStorage();
-    if (kDebugMode) {
-      print('query all rows:');
-    }
-    for (var element in allRows) {
-      allStorageID.add(element["_id"]);
-      allStorageName.add(element["name"]);
-
-      categoryMap[element["_id"]] = element["name"];
-    }
-    setState(() {});
   }
+  // void _insert() async {
+  //   try {
+  //     int quantity = int.parse(_itemQty.text);
+
+  //     Map<String, dynamic> row = {
+  //       DatabaseHelper.columnName: _itemName.text,
+  //       DatabaseHelper.columnStorage: currentStorage,
+  //       DatabaseHelper.columnQty: quantity,
+  //     };
+
+  //     if (allStorageID.isNotEmpty) {
+  //       currentStorage = allStorageID[0];
+  //     }
+
+  //     final id = await dbHelper.insertItem(row);
+  //     if (kDebugMode) {
+  //       print('inserted row id: $id');
+  //     }
+
+  //     widget.insertCallback(); // Call the callback function from ItemList
+  //     Navigator.of(context).pop();
+  //     _queryStorage();
+  //   } catch (e) {
+  //     print('Error inserting item: $e');
+  //     // Handle the error as needed
+  //   }
+  // }
+
+  // void _queryStorage() async {
+  //   final allRows = await dbHelper.queryAllRowsStorage();
+  //   if (kDebugMode) {
+  //     print('query all rows:');
+  //   }
+  //   for (var element in allRows) {
+  //     allStorageID.add(element["_id"]);
+  //     allStorageName.add(element["name"]);
+
+  //     categoryMap[element["_id"]] = element["name"];
+  //   }
+  //   setState(() {});
+  // }
 }

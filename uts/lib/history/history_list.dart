@@ -13,7 +13,7 @@ class HistoryList extends StatefulWidget {
 
 class _HistoryListState extends State<HistoryList> {
   final dbHelper = DatabaseHelper.instance;
-  List<Map<String, dynamic>> allHistoryData = [];
+  List<dynamic>  allHistoryData = [];
 
   Icon _getLeadingIcon(String status) {
     if (status == "In") {
@@ -117,19 +117,32 @@ class _HistoryListState extends State<HistoryList> {
     );
   }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsHistory();
-    print('query all rows:');
-    allRows.forEach(print);
+Future<void> _query() async {
+    await dbHelper.ambilData();
     setState(() {
-      allHistoryData = allRows;
+      allHistoryData = dbHelper.getHistories();
     });
   }
+  void _insert() async{
 
-  void _delete(int id) async {
-    // Assuming that the number of rows is the id for the last row.
-    final rowsDeleted = await dbHelper.deleteItem(id);
-    print('deleted $rowsDeleted row(s): row $id');
-    _query();
   }
+
+  void _delete() async{
+    
+  }
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsHistory();
+  //   print('query all rows:');
+  //   allRows.forEach(print);
+  //   setState(() {
+  //     allHistoryData = allRows;
+  //   });
+  // }
+
+  // void _delete(int id) async {
+  //   // Assuming that the number of rows is the id for the last row.
+  //   final rowsDeleted = await dbHelper.deleteItem(id);
+  //   print('deleted $rowsDeleted row(s): row $id');
+  //   _query();
+  // }
 }

@@ -169,35 +169,42 @@ class _EditItemState extends State<EditItem> {
     );
   }
 
-  void _update() async {
+  Future<void> _query() async {
 
-    // row to insert
-    Map<String, dynamic> row = {
-      DatabaseHelper.columnName: _itemName.text,
-      DatabaseHelper.columnStorage: _storageName.text,
-      DatabaseHelper.columnQty: _itemQty.text,
-      // DatabaseHelper.columnProfile: base64image,
-    };
-    print('insert stRT');
-    currentStorage = 0;
+  }
+  void _update() async{
 
-    final id = await dbHelper.updateItem(row);
-    if (kDebugMode) {
-      print('updated row id: $id');
-    }
-    Navigator.of(context).pop();
-    _query();
   }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsStorage();
-    if (kDebugMode) {
-      print('query all rows:');
-    }
-    for (var element in allRows) {
-      allStorageID.add(element["_id"]);
-      allStorageName.add(element["name"]);
-    }
-    setState(() {});
-  }
+  // void _update() async {
+
+  //   // row to insert
+  //   Map<String, dynamic> row = {
+  //     DatabaseHelper.columnName: _itemName.text,
+  //     DatabaseHelper.columnStorage: _storageName.text,
+  //     DatabaseHelper.columnQty: _itemQty.text,
+  //     // DatabaseHelper.columnProfile: base64image,
+  //   };
+  //   print('insert stRT');
+  //   currentStorage = 0;
+
+  //   final id = await dbHelper.updateItem(row);
+  //   if (kDebugMode) {
+  //     print('updated row id: $id');
+  //   }
+  //   Navigator.of(context).pop();
+  //   _query();
+  // }
+
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsStorage();
+  //   if (kDebugMode) {
+  //     print('query all rows:');
+  //   }
+  //   for (var element in allRows) {
+  //     allStorageID.add(element["_id"]);
+  //     allStorageName.add(element["name"]);
+  //   }
+  //   setState(() {});
+  // }
 }

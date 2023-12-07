@@ -14,7 +14,7 @@ class ItemList extends StatefulWidget {
 
 class _ItemListState extends State<ItemList> {
   final dbHelper = DatabaseHelper.instance;
-  List<Map<String, dynamic>> allItemData = [];
+  List<dynamic>  allItemData = [];
 
   Icon _getLeadingIcon(int qty) {
     if (qty > 5) {
@@ -93,7 +93,7 @@ class _ItemListState extends State<ItemList> {
                               color: Colors.brown[900],
                             ),
                             onPressed: () {
-                              _delete(item['itemId']);
+                              _delete();
                             },
                           ),
                         ],
@@ -136,18 +136,31 @@ class _ItemListState extends State<ItemList> {
     );
   }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsItem();
-    print('query all rows:');
-    // allRows.forEach(print);
+  Future<void> _query() async {
+    await dbHelper.ambilData();
     setState(() {
-      allItemData = allRows;
+      allItemData = dbHelper.getItems();
     });
   }
+  void _insert() async{
 
-  void _delete(int id) async {
-    final rowsDeleted = await dbHelper.deleteItem(id);
-    print('deleted $rowsDeleted row(s): row $id');
-    _query();
   }
+
+  void _delete() async{
+    
+  }
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsItem();
+  //   print('query all rows:');
+  //   // allRows.forEach(print);
+  //   setState(() {
+  //     allItemData = allRows;
+  //   });
+  // }
+
+  // void _delete(int id) async {
+  //   final rowsDeleted = await dbHelper.deleteItem(id);
+  //   print('deleted $rowsDeleted row(s): row $id');
+  //   _query();
+  // }
 }

@@ -173,40 +173,47 @@ class _AddHistoryState extends State<AddHistory> {
     );
   }
 
-  void _insert() async {
+  Future<void> _query() async {
+
+  }
+  void _insert() async{
+
+  }
+
+  // void _insert() async {
     
-    int quantity = int.parse(_historyQty.text);
+  //   int quantity = int.parse(_historyQty.text);
 
-    Map<String, dynamic> row = {
-      DatabaseHelper.columnItem: currentItem,
-      DatabaseHelper.columnStatus: selectedStatus,
-      DatabaseHelper.columnQty: quantity,
-      // DatabaseHelper.columnProfile: base64image,
-    };
-    print('insert stRT');
-    if (allItemID.isNotEmpty) {
-      currentItem = allItemID[0];
-    }
+  //   Map<String, dynamic> row = {
+  //     DatabaseHelper.columnItem: currentItem,
+  //     DatabaseHelper.columnStatus: selectedStatus,
+  //     DatabaseHelper.columnQty: quantity,
+  //     // DatabaseHelper.columnProfile: base64image,
+  //   };
+  //   print('insert stRT');
+  //   if (allItemID.isNotEmpty) {
+  //     currentItem = allItemID[0];
+  //   }
 
-    final id = await dbHelper.insertHistory(row);
-    if (kDebugMode) {
-      print('inserted row id: $id');
-    }
-    _query();
-    Navigator.of(context).pop();
-  }
+  //   final id = await dbHelper.insertHistory(row);
+  //   if (kDebugMode) {
+  //     print('inserted row id: $id');
+  //   }
+  //   _query();
+  //   Navigator.of(context).pop();
+  // }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsItem();
-    if (kDebugMode) {
-      print('query all rows:');
-    }
-    for (var element in allRows) {
-      allItemID.add(element["itemId"]);
-      allItemName.add(element["itemName"]);
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsItem();
+  //   if (kDebugMode) {
+  //     print('query all rows:');
+  //   }
+  //   for (var element in allRows) {
+  //     allItemID.add(element["itemId"]);
+  //     allItemName.add(element["itemName"]);
 
-      itemMap[element["itemId"]] = element["itemName"];
-    }
-    setState(() {});
-  }
+  //     itemMap[element["itemId"]] = element["itemName"];
+  //   }
+  //   setState(() {});
+  // }
 }
