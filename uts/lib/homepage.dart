@@ -5,7 +5,7 @@ import 'package:uts/colors.dart';
 import 'package:uts/history/history_list.dart';
 import 'package:uts/item/item_list.dart';
 import 'package:uts/storage/storage_list.dart';
-import 'package:uts/user_list.dart';
+import 'package:uts/user/user_list.dart';
 import 'db_manager.dart';
 
 class HomePage extends StatefulWidget {

@@ -3,6 +3,7 @@ import 'package:uts/item/item_add.dart';
 import 'package:uts/item/item_edit.dart';
 
 import '/db_manager.dart';
+import '/colors.dart';
 
 class ItemList extends StatefulWidget {
   const ItemList({Key? key}) : super(key: key);

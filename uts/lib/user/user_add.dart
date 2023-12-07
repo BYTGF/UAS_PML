@@ -3,8 +3,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'colors.dart';
-import 'db_manager.dart';
+import '/colors.dart';
+import '/db_manager.dart';
 
 class AddUser extends StatefulWidget {
   const AddUser({Key? key}) : super(key: key);

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:uts/user_add.dart';
+import 'package:uts/user/user_add.dart';
+import '/colors.dart';
 
-import 'db_manager.dart';
+import '/db_manager.dart';
 
 class UserList extends StatefulWidget {
   const UserList({Key? key}) : super(key: key);
