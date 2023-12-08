@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/colors.dart';
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class AddItem extends StatefulWidget {
   final Function insertCallback;
@@ -20,9 +23,7 @@ class _AddItemState extends State<AddItem> {
   final TextEditingController _itemQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
   int currentStorage = 0;
-  List<int> allStorageID = [];
-  List<String> allStorageName = [];
-  Map<int, String> categoryMap = {};
+  List<dynamic> allStorageData = [];
   final dbHelper = DatabaseHelper.instance;
 
   @override
@@ -88,9 +89,9 @@ class _AddItemState extends State<AddItem> {
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<int>(
                           isExpanded: true,
-                          items: categoryMap.entries.map((entry) {
-                            int id = entry.key;
-                            String name = entry.value;
+                          items: allStorageData.map((data) {
+                            int id = data["storage_id"];
+                            String name = data["name"];
                             return DropdownMenuItem<int>(
                               value: id,
                               child: Text(name),
@@ -98,7 +99,7 @@ class _AddItemState extends State<AddItem> {
                           }).toList(),
                           onChanged: (selectedID) {
                             setState(() {
-                              currentStorage = selectedID!;
+                              currentStorage = int.parse(selectedID.toString());
                             });
                           },
                           hint: Text("Select Storage"),
@@ -165,10 +166,30 @@ class _AddItemState extends State<AddItem> {
   }
 
   Future<void> _queryStorage() async {
-
+    await dbHelper.ambilData();
+    setState(() {
+      allStorageData = dbHelper.getStorages();
+    });
   }
   void _insert() async{
+    int quantity = int.parse(_itemQty.text);
 
+    var itemName = _itemName.text;
+    var itemQty = quantity;
+    var requestBody = {'itemName': itemName, 'storageId' : currentStorage, 'itemQty': itemQty};
+
+    print(requestBody);
+    var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
+    var uri = Uri.parse(url);
+    var response = await http.post(uri, body: requestBody);
+    var body = response.body;
+    var json = jsonDecode(body);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+    if (json['success'] == 1) {
+      widget.insertCallback(); // Call the callback function from ItemList
+      Navigator.of(context).pop();
+    }
   }
   // void _insert() async {
   //   try {

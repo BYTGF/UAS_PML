@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '/colors.dart';
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class AddUser extends StatefulWidget {
   const AddUser({Key? key}) : super(key: key);

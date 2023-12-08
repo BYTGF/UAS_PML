@@ -3,6 +3,7 @@ import 'package:uts/user/user_add.dart';
 import '/colors.dart';
 
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class UserList extends StatefulWidget {
   const UserList({Key? key}) : super(key: key);
@@ -45,8 +46,8 @@ class _UserListState extends State<UserList> {
                     var item = allUserData[index];
                     return ListTile(
                       leading: Icon(Icons.account_circle),
-                      title: Text("${item['username']}"),
-                      subtitle: Text("${item['date']}"),
+                      title: Text("${item['name']}"),
+                      subtitle: Text("${item['username']}"),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[

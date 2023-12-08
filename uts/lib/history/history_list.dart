@@ -3,6 +3,7 @@ import 'package:uts/history/history_add.dart';
 
 import '/db_manager.dart';
 import '/colors.dart';
+import 'package:http/http.dart' as http;
 
 class HistoryList extends StatefulWidget {
   const HistoryList({Key? key}) : super(key: key);
@@ -15,8 +16,8 @@ class _HistoryListState extends State<HistoryList> {
   final dbHelper = DatabaseHelper.instance;
   List<dynamic>  allHistoryData = [];
 
-  Icon _getLeadingIcon(String status) {
-    if (status == "In") {
+  Icon _getLeadingIcon(int status) {
+    if (status == 1) {
       return Icon(Icons.check_circle);
     } else {
       return Icon(

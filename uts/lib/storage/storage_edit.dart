@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:uts/colors.dart';
 
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class EditStorage extends StatefulWidget {
   final int id;

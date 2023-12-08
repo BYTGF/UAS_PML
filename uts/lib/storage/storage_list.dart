@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:uts/colors.dart';
 import 'package:uts/storage/storage_edit.dart';
 
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class StorageList extends StatefulWidget {
   const StorageList({Key? key}) : super(key: key);
@@ -128,7 +131,7 @@ class _StorageListState extends State<StorageList> {
                                                 height: 400,
                                                 child: Center(
                                                   child: EditStorage(
-                                                    id: item['_id'],
+                                                    id: item['storage_id'],
                                                     name: item['name'],
                                                   ),
                                                 )));
@@ -143,7 +146,7 @@ class _StorageListState extends State<StorageList> {
                                     color: Colors.brown[900],
                                   ),
                                   onPressed: () {
-                                    
+                                    _delete(item['storage_id']);
                                   },
                                 ),
                               ],
@@ -172,11 +175,34 @@ class _StorageListState extends State<StorageList> {
     });
   }
   void _insert() async{
+    var storageName = _StorageName.text;
+    var requestBody = {'storageName': storageName};
 
+    var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
+    var uri = Uri.parse(url);
+    var response = await http.post(uri, body: requestBody);
+    var body = response.body;
+    var json = jsonDecode(body);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+    if (json['success'] == 1) {
+      _query();
+    }
   }
 
-  void _delete() async{
-    
+  void _delete(int id) async{
+    var requestBody = {'storageId': id};
+
+    var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
+    var uri = Uri.parse(url);
+    var response = await http.post(uri, body: requestBody);
+    var body = response.body;
+    var json = jsonDecode(body);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+    if (json['success'] == 1) {
+      _query();
+    }
   }
   // void _insert() async {
   //   // row to insert

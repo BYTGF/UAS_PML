@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import '/colors.dart';
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 
 class AddHistory extends StatefulWidget {
