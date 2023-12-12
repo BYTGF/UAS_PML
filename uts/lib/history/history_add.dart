@@ -26,7 +26,18 @@ class _AddHistoryState extends State<AddHistory> {
   int? selectedStatus;
   final TextEditingController _historyQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
-  int currentItem = 0;
+  late int currentItem;
+  int getFirstItemId() {
+    if (allItemData.isNotEmpty) {
+      // Access the first item and get its 'id'
+      dynamic firstItem = allItemData[0];
+      int firstItemId = firstItem['item_id'];
+      return firstItemId;
+    } else {
+      // Handle the case when the list is empty
+      return 0; // or any default value
+    }
+  }
   List<dynamic> allItemData = [];
   final dbHelper = DatabaseHelper.instance;
 
@@ -36,7 +47,7 @@ class _AddHistoryState extends State<AddHistory> {
   void initState() {
     super.initState();
     _query();
-    currentItem = 1;
+    currentItem = getFirstItemId();
   }
 
   @override
@@ -83,7 +94,7 @@ class _AddHistoryState extends State<AddHistory> {
                             });
                           },
                             hint: Text("Select Item"),
-                            value: currentItem,
+                            value: currentItem != null && allItemData.any((data) => data["Item_id"] == currentItem) ? currentItem : null,
                           ),
                         )
                       ),

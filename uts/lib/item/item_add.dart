@@ -22,15 +22,26 @@ class _AddItemState extends State<AddItem> {
   final TextEditingController _itemName = TextEditingController();
   final TextEditingController _itemQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
-  int currentStorage = 0;
+  late int currentStorage;
   List<dynamic> allStorageData = [];
+  int getFirstStorageId() {
+    if (allStorageData.isNotEmpty) {
+      // Access the first item and get its 'id'
+      dynamic firstStorage = allStorageData[0];
+      int firstStorageId = firstStorage['storage_id'];
+      return firstStorageId;
+    } else {
+      // Handle the case when the list is empty
+      return 0; // or any default value
+    }
+  }
   final dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
     _queryStorage();
-    currentStorage = 1;
+    currentStorage = getFirstStorageId();
   }
 
   @override
@@ -103,7 +114,7 @@ class _AddItemState extends State<AddItem> {
                             });
                           },
                           hint: Text("Select Storage"),
-                          value: currentStorage,
+                          value: currentStorage != null && allStorageData.any((data) => data["storage_id"] == currentStorage) ? currentStorage : null,
                         ),
                       )),
                   SizedBox(
@@ -170,6 +181,10 @@ class _AddItemState extends State<AddItem> {
     setState(() {
       allStorageData = dbHelper.getStorages();
     });
+    print(allStorageData);
+    print(getFirstStorageId());
+    print(currentStorage);
+    
   }
   void _insert() async{
     String itemName = _itemName.text;

@@ -128,7 +128,7 @@ Future<void> _query() async {
       allHistoryData = dbHelper.getHistories();
     });
   }
-  void _insert() async{
+  void _update() async{
 
   }
 
