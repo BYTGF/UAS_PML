@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:uts/item/item_add.dart';
 import 'package:uts/item/item_edit.dart';
@@ -94,7 +96,7 @@ class _ItemListState extends State<ItemList> {
                               color: Colors.brown[900],
                             ),
                             onPressed: () {
-                              _delete();
+                              _delete(item['itemId']);
                             },
                           ),
                         ],
@@ -103,7 +105,7 @@ class _ItemListState extends State<ItemList> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Quantity : ${item['itemQty']}'),
-                            duration: const Duration(seconds: 3),
+                            duration: const Duration(seconds: 1),
                           ),
                         );
                       },
@@ -141,14 +143,25 @@ class _ItemListState extends State<ItemList> {
     await dbHelper.ambilData();
     setState(() {
       allItemData = dbHelper.getItems();
+      
     });
-  }
-  void _insert() async{
-
+    ;
   }
 
-  void _delete() async{
-    
+  void _delete(int id) async{
+    String idStorage = id.toString();
+    var requestBody = {'storageId': idStorage};
+
+    var url = 'https://apiuaspml.000webhostapp.com/data_delete.php';
+    var uri = Uri.parse(url);
+    var response = await http.post(uri, body: requestBody);
+    var body = response.body;
+    var json = jsonDecode(body);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+    if (json['success'] == 1) {
+      _query();
+    }
   }
   // void _query() async {
   //   final allRows = await dbHelper.queryAllRowsItem();

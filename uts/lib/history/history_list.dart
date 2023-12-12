@@ -25,6 +25,10 @@ class _HistoryListState extends State<HistoryList> {
     }
   }
 
+  void _insertCallback() {
+    _query(); // Refresh the list after insertion
+  }
+
   @override
   void initState() {
     super.initState();
@@ -58,16 +62,16 @@ class _HistoryListState extends State<HistoryList> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          IconButton(
-                            icon: Icon(
-                              Icons.edit_note,
-                              size: 20.0,
-                              color: Colors.brown[900],
-                            ),
-                            onPressed: () {
-                              // _onDeleteItemPressed(index);
-                            },
-                          ),
+                          // IconButton(
+                          //   icon: Icon(
+                          //     Icons.edit_note,
+                          //     size: 20.0,
+                          //     color: Colors.brown[900],
+                          //   ),
+                          //   onPressed: () {
+                          //     // _onDeleteItemPressed(index);
+                          //   },
+                          // ),
                           // IconButton(
                           //   icon: Icon(
                           //     Icons.delete_outline,
@@ -83,8 +87,8 @@ class _HistoryListState extends State<HistoryList> {
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Quantity : ${item['itemQty']}'),
-                            duration: const Duration(seconds: 3),
+                            content: Text('Quantity : ${item['historyQty']}'),
+                            duration: const Duration(seconds: 1),
                           ),
                         );
                       },
@@ -104,7 +108,7 @@ class _HistoryListState extends State<HistoryList> {
                   child: Container(
                     height: 400,
                     child: Center(
-                      child: AddHistory(),
+                      child: AddHistory(insertCallback: _insertCallback),
                     ),
                   ),
                 );

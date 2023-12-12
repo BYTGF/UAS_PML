@@ -174,9 +174,12 @@ class _StorageListState extends State<StorageList> {
       allStorageData = dbHelper.getStorages();
     });
   }
+  
   void _insert() async{
     var storageName = _StorageName.text;
     var requestBody = {'storageName': storageName};
+
+    print(storageName);
 
     var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
     var uri = Uri.parse(url);
@@ -191,9 +194,10 @@ class _StorageListState extends State<StorageList> {
   }
 
   void _delete(int id) async{
-    var requestBody = {'storageId': id};
+    String idStorage = id.toString();
+    var requestBody = {'storageId': idStorage};
 
-    var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
+    var url = 'https://apiuaspml.000webhostapp.com/data_delete.php';
     var uri = Uri.parse(url);
     var response = await http.post(uri, body: requestBody);
     var body = response.body;

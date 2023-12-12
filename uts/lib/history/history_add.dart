@@ -3,6 +3,8 @@
 // import 'dart:convert';
 // import 'dart:typed_data';
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -12,20 +14,20 @@ import 'package:http/http.dart' as http;
 
 
 class AddHistory extends StatefulWidget {
-  const AddHistory({Key? key}) : super(key: key);
+  final Function insertCallback;
+
+  AddHistory({required this.insertCallback});
 
   @override
   _AddHistoryState createState() => _AddHistoryState();
 }
 
 class _AddHistoryState extends State<AddHistory> {
-  String? selectedStatus;
+  int? selectedStatus;
   final TextEditingController _historyQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
   int currentItem = 0;
-  List<int> allItemID = [];
-  List<String> allItemName = [];
-  Map<int, String> itemMap = {};
+  List<dynamic> allItemData = [];
   final dbHelper = DatabaseHelper.instance;
 
 // INITIALIZE. RESULT IS A WIDGET, SO IT CAN BE DIRECTLY USED IN BUILD METHOD
@@ -67,19 +69,19 @@ class _AddHistoryState extends State<AddHistory> {
                         child:DropdownButtonHideUnderline(
                           child: DropdownButton<int>(
                             isExpanded: true,
-                            items: itemMap.entries.map((entry) {
-                              int id = entry.key;
-                              String name = entry.value;
-                              return DropdownMenuItem<int>(
-                                value: id,
-                                child: Text(name),
-                              );
-                            }).toList(),
-                            onChanged: (selectedID) {
-                              setState(() {
-                                currentItem = selectedID!;
-                              });
-                            },
+                          items: allItemData.map((data) {
+                            int id = data["itemId"];
+                            String name = data["itemName"];
+                            return DropdownMenuItem<int>(
+                              value: id,
+                              child: Text(name),
+                            );
+                          }).toList(),
+                          onChanged: (selectedID) {
+                            setState(() {
+                              currentItem = int.parse(selectedID.toString());
+                            });
+                          },
                             hint: Text("Select Item"),
                             value: currentItem,
                           ),
@@ -92,8 +94,8 @@ class _AddHistoryState extends State<AddHistory> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Text('Status: '),
-                          Radio<String>(
-                            value: 'In',
+                          Radio<int>(
+                            value: 1,
                             groupValue: selectedStatus,
                             onChanged: (value) {
                               setState(() {
@@ -102,8 +104,8 @@ class _AddHistoryState extends State<AddHistory> {
                             },
                           ),
                           Text('In'),
-                          Radio<String>(
-                            value: 'Out',
+                          Radio<int>(
+                            value: 0,
                             groupValue: selectedStatus,
                             onChanged: (value) {
                               setState(() {
@@ -175,10 +177,37 @@ class _AddHistoryState extends State<AddHistory> {
   }
 
   Future<void> _query() async {
-
+    await dbHelper.ambilData();
+    setState(() {
+      allItemData = dbHelper.getItems();
+    });
+    ;
   }
   void _insert() async{
 
+    var requestBody = {
+      'itemId': currentItem.toString(),
+      'historyStatus': selectedStatus.toString(), // Keep it as an int
+      'historyQty': _historyQty.text,
+    };
+
+    print(requestBody);
+    var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
+    var uri = Uri.parse(url);
+
+    var response = await http.post(uri, body: requestBody);
+
+    var body = response.body;
+
+    var json = jsonDecode(body);
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+        print("1");
+    if (json['success'] == 1) {
+      widget.insertCallback(); // Call the callback function from ItemList
+      Navigator.of(context).pop();
+    }
   }
 
   // void _insert() async {

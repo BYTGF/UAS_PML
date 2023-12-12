@@ -172,20 +172,30 @@ class _AddItemState extends State<AddItem> {
     });
   }
   void _insert() async{
-    int quantity = int.parse(_itemQty.text);
+    String itemName = _itemName.text;
+    String itemQty = _itemQty.text;
 
-    var itemName = _itemName.text;
-    var itemQty = quantity;
-    var requestBody = {'itemName': itemName, 'storageId' : currentStorage, 'itemQty': itemQty};
+    var requestBody = {
+      'itemName': itemName,
+      'storageId': currentStorage.toString(), // Keep it as an int
+      'itemQty': itemQty,
+    };
+
+    print(currentStorage.toString());
 
     print(requestBody);
     var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
     var uri = Uri.parse(url);
+
     var response = await http.post(uri, body: requestBody);
+
     var body = response.body;
+
     var json = jsonDecode(body);
+
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(json['message'])));
+        print("1");
     if (json['success'] == 1) {
       widget.insertCallback(); // Call the callback function from ItemList
       Navigator.of(context).pop();
