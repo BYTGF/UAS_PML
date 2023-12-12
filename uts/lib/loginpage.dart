@@ -1,9 +1,47 @@
-import 'package:flutter/material.dart';
-import 'package:uts/homepage.dart';
-import 'package:uts/colors.dart';
+import 'dart:convert';
 
-class LoginPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:http/http.dart'
+    as http; // Import the HTTP package for making requests
+
+class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passController = TextEditingController();
+
+  Future<void> loginUser(BuildContext context) async {
+    final response = await http.post(
+      Uri.parse('https://apiuaspml.000webhostapp.com/authentication_login.php'),
+      body: {
+        'username': usernameController.text,
+        'pass': passController.text,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['status'] == 'success') {
+        // Navigate to the home page upon successful login
+        Navigator.pushNamed(context, '/home');
+      } else {
+        // Display an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'])),
+        );
+      }
+    } else {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error connecting to the server')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,21 +54,12 @@ class LoginPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("Welcome Back"),
-
-              const SizedBox(
-                height: 11,
-              ),
-
+              const SizedBox(height: 11),
               Text("Please fill your document"),
-
-              // TextAlign: TextAlign.Center,
-              const SizedBox(
-                height: 64,
-              ),
+              const SizedBox(height: 64),
               Column(
-                // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Email"),
+                  Text("username"),
                   const SizedBox(height: 10),
                   Container(
                     width: double.infinity,
@@ -39,11 +68,13 @@ class LoginPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                     child: TextField(
+                      controller: usernameController,
                       decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "kelompokgg@gmail.com",
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 17)),
+                        border: InputBorder.none,
+                        hintText: "kelompokgg@gmail.com",
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 15),
@@ -56,6 +87,8 @@ class LoginPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                     child: TextField(
+                      controller: passController,
+                      obscureText: true, // Hide the password
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         contentPadding:
@@ -65,21 +98,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 15,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              SizedBox(height: 20),
               SizedBox(
                 height: 32,
               ),
@@ -92,7 +111,7 @@ class LoginPage extends StatelessWidget {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/home');
+                    loginUser(context);
                   },
                   child: Text("Login Bro"),
                 ),
