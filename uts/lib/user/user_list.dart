@@ -3,6 +3,7 @@ import 'package:uts/user/user_add.dart';
 import '/colors.dart';
 
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class UserList extends StatefulWidget {
   const UserList({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class UserList extends StatefulWidget {
 
 class _UserListState extends State<UserList> {
   final dbHelper = DatabaseHelper.instance;
-  List<Map<String, dynamic>> allUserData = [];
+  List<dynamic>  allUserData = [];
 
   @override
   void initState() {
@@ -45,8 +46,8 @@ class _UserListState extends State<UserList> {
                     var item = allUserData[index];
                     return ListTile(
                       leading: Icon(Icons.account_circle),
-                      title: Text("${item['username']}"),
-                      subtitle: Text("${item['date']}"),
+                      title: Text("${item['name']}"),
+                      subtitle: Text("${item['username']}"),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
@@ -67,7 +68,7 @@ class _UserListState extends State<UserList> {
                               color: Colors.brown[900],
                             ),
                             onPressed: () {
-                              _delete(item['_id']);
+                              _delete();
                             },
                           ),
                         ],
@@ -104,19 +105,32 @@ class _UserListState extends State<UserList> {
     );
   }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsUser();
-    print('query all rows:');
-    allRows.forEach(print);
+Future<void> _query() async {
+    await dbHelper.ambilData();
     setState(() {
-      allUserData = allRows;
+      allUserData = dbHelper.getUsers();
     });
   }
+  void _insert() async{
 
-  void _delete(int id) async {
-    // Assuming that the number of rows is the id for the last row.
-    final rowsDeleted = await dbHelper.deleteUser(id);
-    print('deleted $rowsDeleted row(s): row $id');
-    _query();
   }
+
+  void _delete() async{
+    
+  }
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsUser();
+  //   print('query all rows:');
+  //   allRows.forEach(print);
+  //   setState(() {
+  //     allUserData = allRows;
+  //   });
+  // }
+
+  // void _delete(int id) async {
+  //   // Assuming that the number of rows is the id for the last row.
+  //   final rowsDeleted = await dbHelper.deleteUser(id);
+  //   print('deleted $rowsDeleted row(s): row $id');
+  //   _query();
+  // }
 }

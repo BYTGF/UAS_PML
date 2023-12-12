@@ -3,28 +3,42 @@
 // import 'dart:convert';
 // import 'dart:typed_data';
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/colors.dart';
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 
 class AddHistory extends StatefulWidget {
-  const AddHistory({Key? key}) : super(key: key);
+  final Function insertCallback;
+
+  AddHistory({required this.insertCallback});
 
   @override
   _AddHistoryState createState() => _AddHistoryState();
 }
 
 class _AddHistoryState extends State<AddHistory> {
-  String? selectedStatus;
+  int? selectedStatus;
   final TextEditingController _historyQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
-  int currentItem = 0;
-  List<int> allItemID = [];
-  List<String> allItemName = [];
-  Map<int, String> itemMap = {};
+  late int currentItem;
+  int getFirstItemId() {
+    if (allItemData.isNotEmpty) {
+      // Access the first item and get its 'id'
+      dynamic firstItem = allItemData[0];
+      int firstItemId = firstItem['item_id'];
+      return firstItemId;
+    } else {
+      // Handle the case when the list is empty
+      return 0; // or any default value
+    }
+  }
+  List<dynamic> allItemData = [];
   final dbHelper = DatabaseHelper.instance;
 
 // INITIALIZE. RESULT IS A WIDGET, SO IT CAN BE DIRECTLY USED IN BUILD METHOD
@@ -33,7 +47,7 @@ class _AddHistoryState extends State<AddHistory> {
   void initState() {
     super.initState();
     _query();
-    currentItem = 1;
+    currentItem = getFirstItemId();
   }
 
   @override
@@ -66,21 +80,21 @@ class _AddHistoryState extends State<AddHistory> {
                         child:DropdownButtonHideUnderline(
                           child: DropdownButton<int>(
                             isExpanded: true,
-                            items: itemMap.entries.map((entry) {
-                              int id = entry.key;
-                              String name = entry.value;
-                              return DropdownMenuItem<int>(
-                                value: id,
-                                child: Text(name),
-                              );
-                            }).toList(),
-                            onChanged: (selectedID) {
-                              setState(() {
-                                currentItem = selectedID!;
-                              });
-                            },
+                          items: allItemData.map((data) {
+                            int id = data["itemId"];
+                            String name = data["itemName"];
+                            return DropdownMenuItem<int>(
+                              value: id,
+                              child: Text(name),
+                            );
+                          }).toList(),
+                          onChanged: (selectedID) {
+                            setState(() {
+                              currentItem = int.parse(selectedID.toString());
+                            });
+                          },
                             hint: Text("Select Item"),
-                            value: currentItem,
+                            value: currentItem != null && allItemData.any((data) => data["Item_id"] == currentItem) ? currentItem : null,
                           ),
                         )
                       ),
@@ -91,8 +105,8 @@ class _AddHistoryState extends State<AddHistory> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Text('Status: '),
-                          Radio<String>(
-                            value: 'In',
+                          Radio<int>(
+                            value: 1,
                             groupValue: selectedStatus,
                             onChanged: (value) {
                               setState(() {
@@ -101,8 +115,8 @@ class _AddHistoryState extends State<AddHistory> {
                             },
                           ),
                           Text('In'),
-                          Radio<String>(
-                            value: 'Out',
+                          Radio<int>(
+                            value: 0,
                             groupValue: selectedStatus,
                             onChanged: (value) {
                               setState(() {
@@ -173,40 +187,74 @@ class _AddHistoryState extends State<AddHistory> {
     );
   }
 
-  void _insert() async {
-    
-    int quantity = int.parse(_historyQty.text);
+  Future<void> _query() async {
+    await dbHelper.ambilData();
+    setState(() {
+      allItemData = dbHelper.getItems();
+    });
+    ;
+  }
+  void _insert() async{
 
-    Map<String, dynamic> row = {
-      DatabaseHelper.columnItem: currentItem,
-      DatabaseHelper.columnStatus: selectedStatus,
-      DatabaseHelper.columnQty: quantity,
-      // DatabaseHelper.columnProfile: base64image,
+    var requestBody = {
+      'itemId': currentItem.toString(),
+      'historyStatus': selectedStatus.toString(), // Keep it as an int
+      'historyQty': _historyQty.text,
     };
-    print('insert stRT');
-    if (allItemID.isNotEmpty) {
-      currentItem = allItemID[0];
-    }
 
-    final id = await dbHelper.insertHistory(row);
-    if (kDebugMode) {
-      print('inserted row id: $id');
+    print(requestBody);
+    var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
+    var uri = Uri.parse(url);
+
+    var response = await http.post(uri, body: requestBody);
+
+    var body = response.body;
+
+    var json = jsonDecode(body);
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+        print("1");
+    if (json['success'] == 1) {
+      widget.insertCallback(); // Call the callback function from ItemList
+      Navigator.of(context).pop();
     }
-    _query();
-    Navigator.of(context).pop();
   }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsItem();
-    if (kDebugMode) {
-      print('query all rows:');
-    }
-    for (var element in allRows) {
-      allItemID.add(element["itemId"]);
-      allItemName.add(element["itemName"]);
+  // void _insert() async {
+    
+  //   int quantity = int.parse(_historyQty.text);
 
-      itemMap[element["itemId"]] = element["itemName"];
-    }
-    setState(() {});
-  }
+  //   Map<String, dynamic> row = {
+  //     DatabaseHelper.columnItem: currentItem,
+  //     DatabaseHelper.columnStatus: selectedStatus,
+  //     DatabaseHelper.columnQty: quantity,
+  //     // DatabaseHelper.columnProfile: base64image,
+  //   };
+  //   print('insert stRT');
+  //   if (allItemID.isNotEmpty) {
+  //     currentItem = allItemID[0];
+  //   }
+
+  //   final id = await dbHelper.insertHistory(row);
+  //   if (kDebugMode) {
+  //     print('inserted row id: $id');
+  //   }
+  //   _query();
+  //   Navigator.of(context).pop();
+  // }
+
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsItem();
+  //   if (kDebugMode) {
+  //     print('query all rows:');
+  //   }
+  //   for (var element in allRows) {
+  //     allItemID.add(element["itemId"]);
+  //     allItemName.add(element["itemName"]);
+
+  //     itemMap[element["itemId"]] = element["itemName"];
+  //   }
+  //   setState(() {});
+  // }
 }

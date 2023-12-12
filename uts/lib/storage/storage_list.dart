@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:uts/colors.dart';
 import 'package:uts/storage/storage_edit.dart';
 
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class StorageList extends StatefulWidget {
   const StorageList({Key? key}) : super(key: key);
@@ -15,7 +18,7 @@ class StorageList extends StatefulWidget {
 
 class _StorageListState extends State<StorageList> {
   final dbHelper = DatabaseHelper.instance;
-  List<Map<String, dynamic>> allStorageData = [];
+  List<dynamic>  allStorageData = [];
   TextEditingController _StorageName = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
   @override
@@ -128,7 +131,7 @@ class _StorageListState extends State<StorageList> {
                                                 height: 400,
                                                 child: Center(
                                                   child: EditStorage(
-                                                    id: item['_id'],
+                                                    id: item['storage_id'],
                                                     name: item['name'],
                                                   ),
                                                 )));
@@ -143,7 +146,7 @@ class _StorageListState extends State<StorageList> {
                                     color: Colors.brown[900],
                                   ),
                                   onPressed: () {
-                                    _delete(item['_id']);
+                                    _delete(item['storage_id']);
                                   },
                                 ),
                               ],
@@ -165,29 +168,69 @@ class _StorageListState extends State<StorageList> {
     ));
   }
 
-  void _insert() async {
-    // row to insert
-    Map<String, dynamic> row = {DatabaseHelper.columnName: _StorageName.text};
-    print('insert stRT');
+  Future<void> _query() async {
+    await dbHelper.ambilData();
+    setState(() {
+      allStorageData = dbHelper.getStorages();
+    });
+  }
+  
+  void _insert() async{
+    var storageName = _StorageName.text;
+    var requestBody = {'storageName': storageName};
 
-    final id = await dbHelper.insertStorage(row);
-    print('inserted row id: $id');
-    _StorageName.text = "";
-    _query();
+    print(storageName);
+
+    var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
+    var uri = Uri.parse(url);
+    var response = await http.post(uri, body: requestBody);
+    var body = response.body;
+    var json = jsonDecode(body);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+    if (json['success'] == 1) {
+      _query();
+    }
   }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsStorage();
-    print('query all rows:');
-    allRows.forEach(print);
-    allStorageData = allRows;
-    setState(() {});
-  }
+  void _delete(int id) async{
+    String idStorage = id.toString();
+    var requestBody = {'storageId': idStorage};
 
-  void _delete(int id) async {
-    // Assuming that the number of rows is the id for the last row.
-    final rowsDeleted = await dbHelper.deleteStorage(id);
-    print('deleted $rowsDeleted row(s): row $id');
-    _query();
+    var url = 'https://apiuaspml.000webhostapp.com/data_delete.php';
+    var uri = Uri.parse(url);
+    var response = await http.post(uri, body: requestBody);
+    var body = response.body;
+    var json = jsonDecode(body);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+    if (json['success'] == 1) {
+      _query();
+    }
   }
+  // void _insert() async {
+  //   // row to insert
+  //   Map<String, dynamic> row = {DatabaseHelper.columnName: _StorageName.text};
+  //   print('insert stRT');
+
+  //   final id = await dbHelper.insertStorage(row);
+  //   print('inserted row id: $id');
+  //   _StorageName.text = "";
+  //   _query();
+  // }
+
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsStorage();
+  //   print('query all rows:');
+  //   allRows.forEach(print);
+  //   allStorageData = allRows;
+  //   setState(() {});
+  // }
+
+  // void _delete(int id) async {
+  //   // Assuming that the number of rows is the id for the last row.
+  //   final rowsDeleted = await dbHelper.deleteStorage(id);
+  //   print('deleted $rowsDeleted row(s): row $id');
+  //   _query();
+  // }
 }

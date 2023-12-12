@@ -1,9 +1,12 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:uts/colors.dart';
 
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class EditStorage extends StatefulWidget {
   final int id;
@@ -20,7 +23,7 @@ class EditStorage extends StatefulWidget {
 
 class _EditStorageState extends State<EditStorage> {
   final dbHelper = DatabaseHelper.instance;
-  List<Map<String, dynamic>> allStorageData = [];
+  List<dynamic>  allStorageData = [];
   TextEditingController _StorageName = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
   @override
@@ -106,29 +109,53 @@ class _EditStorageState extends State<EditStorage> {
     ));
   }
 
-  void _update() async {
-    // row to insert
-    Map<String, dynamic> row = {
-      DatabaseHelper.columnId: widget.id,
-      DatabaseHelper.columnName: _StorageName.text
-    };
-    print('insert stRT');
+  Future<void> _query() async {
+      await dbHelper.ambilData();
+      setState(() {
+        allStorageData = dbHelper.getStorages();
+      });
+    }
+  void _update() async{
+    String idStorage = widget.id.toString();
+    var requestBody = {'storageName': _StorageName.text,'storageId': idStorage};
 
-    final rowsUpdated = await dbHelper.updateStorage(row);
-    print('updated row id: $rowsUpdated');
-    _StorageName.text = "";
-    Navigator.of(context).pop();
-    _query();
+    var url = 'https://apiuaspml.000webhostapp.com/data_update.php';
+    var uri = Uri.parse(url);
+    var response = await http.post(uri, body: requestBody);
+    var body = response.body;
+    var json = jsonDecode(body);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+    if (json['success'] == 1) {
+      Navigator.of(context).pop();
+      _query();
+    }
+  }
+
+
+  // void _update() async {
+  //   // row to insert
+  //   Map<String, dynamic> row = {
+  //     DatabaseHelper.columnId: widget.id,
+  //     DatabaseHelper.columnName: _StorageName.text
+  //   };
+  //   print('insert stRT');
+
+  //   final rowsUpdated = await dbHelper.updateStorage(row);
+  //   print('updated row id: $rowsUpdated');
+  //   _StorageName.text = "";
+  //   Navigator.of(context).pop();
+  //   _query();
 
     
-  }
+  // }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsStorage();
-    print('query all rows:');
-    allRows.forEach(print);
-    allStorageData = allRows;
-    setState(() {});
-  }
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsStorage();
+  //   print('query all rows:');
+  //   allRows.forEach(print);
+  //   allStorageData = allRows;
+  //   setState(() {});
+  // }
 
 }

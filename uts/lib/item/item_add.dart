@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/colors.dart';
 import '/db_manager.dart';
+import 'package:http/http.dart' as http;
 
 class AddItem extends StatefulWidget {
   final Function insertCallback;
@@ -19,17 +22,26 @@ class _AddItemState extends State<AddItem> {
   final TextEditingController _itemName = TextEditingController();
   final TextEditingController _itemQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
-  int currentStorage = 0;
-  List<int> allStorageID = [];
-  List<String> allStorageName = [];
-  Map<int, String> categoryMap = {};
+  late int currentStorage;
+  List<dynamic> allStorageData = [];
+  int getFirstStorageId() {
+    if (allStorageData.isNotEmpty) {
+      // Access the first item and get its 'id'
+      dynamic firstStorage = allStorageData[0];
+      int firstStorageId = firstStorage['storage_id'];
+      return firstStorageId;
+    } else {
+      // Handle the case when the list is empty
+      return 0; // or any default value
+    }
+  }
   final dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
     _queryStorage();
-    currentStorage = 1;
+    currentStorage = getFirstStorageId();
   }
 
   @override
@@ -88,9 +100,9 @@ class _AddItemState extends State<AddItem> {
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<int>(
                           isExpanded: true,
-                          items: categoryMap.entries.map((entry) {
-                            int id = entry.key;
-                            String name = entry.value;
+                          items: allStorageData.map((data) {
+                            int id = data["storage_id"];
+                            String name = data["name"];
                             return DropdownMenuItem<int>(
                               value: id,
                               child: Text(name),
@@ -98,11 +110,11 @@ class _AddItemState extends State<AddItem> {
                           }).toList(),
                           onChanged: (selectedID) {
                             setState(() {
-                              currentStorage = selectedID!;
+                              currentStorage = int.parse(selectedID.toString());
                             });
                           },
                           hint: Text("Select Storage"),
-                          value: currentStorage,
+                          value: currentStorage != null && allStorageData.any((data) => data["storage_id"] == currentStorage) ? currentStorage : null,
                         ),
                       )),
                   SizedBox(
@@ -164,45 +176,85 @@ class _AddItemState extends State<AddItem> {
     );
   }
 
-  void _insert() async {
-    try {
-      int quantity = int.parse(_itemQty.text);
+  Future<void> _queryStorage() async {
+    await dbHelper.ambilData();
+    setState(() {
+      allStorageData = dbHelper.getStorages();
+    });
+    print(allStorageData);
+    print(getFirstStorageId());
+    print(currentStorage);
+    
+  }
+  void _insert() async{
+    String itemName = _itemName.text;
+    String itemQty = _itemQty.text;
 
-      Map<String, dynamic> row = {
-        DatabaseHelper.columnName: _itemName.text,
-        DatabaseHelper.columnStorage: currentStorage,
-        DatabaseHelper.columnQty: quantity,
-      };
+    var requestBody = {
+      'itemName': itemName,
+      'storageId': currentStorage.toString(), // Keep it as an int
+      'itemQty': itemQty,
+    };
 
-      if (allStorageID.isNotEmpty) {
-        currentStorage = allStorageID[0];
-      }
+    print(currentStorage.toString());
 
-      final id = await dbHelper.insertItem(row);
-      if (kDebugMode) {
-        print('inserted row id: $id');
-      }
+    print(requestBody);
+    var url = 'https://apiuaspml.000webhostapp.com/data_add.php';
+    var uri = Uri.parse(url);
 
+    var response = await http.post(uri, body: requestBody);
+
+    var body = response.body;
+
+    var json = jsonDecode(body);
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+        print("1");
+    if (json['success'] == 1) {
       widget.insertCallback(); // Call the callback function from ItemList
       Navigator.of(context).pop();
-      _queryStorage();
-    } catch (e) {
-      print('Error inserting item: $e');
-      // Handle the error as needed
     }
   }
+  // void _insert() async {
+  //   try {
+  //     int quantity = int.parse(_itemQty.text);
 
-  void _queryStorage() async {
-    final allRows = await dbHelper.queryAllRowsStorage();
-    if (kDebugMode) {
-      print('query all rows:');
-    }
-    for (var element in allRows) {
-      allStorageID.add(element["_id"]);
-      allStorageName.add(element["name"]);
+  //     Map<String, dynamic> row = {
+  //       DatabaseHelper.columnName: _itemName.text,
+  //       DatabaseHelper.columnStorage: currentStorage,
+  //       DatabaseHelper.columnQty: quantity,
+  //     };
 
-      categoryMap[element["_id"]] = element["name"];
-    }
-    setState(() {});
-  }
+  //     if (allStorageID.isNotEmpty) {
+  //       currentStorage = allStorageID[0];
+  //     }
+
+  //     final id = await dbHelper.insertItem(row);
+  //     if (kDebugMode) {
+  //       print('inserted row id: $id');
+  //     }
+
+  //     widget.insertCallback(); // Call the callback function from ItemList
+  //     Navigator.of(context).pop();
+  //     _queryStorage();
+  //   } catch (e) {
+  //     print('Error inserting item: $e');
+  //     // Handle the error as needed
+  //   }
+  // }
+
+  // void _queryStorage() async {
+  //   final allRows = await dbHelper.queryAllRowsStorage();
+  //   if (kDebugMode) {
+  //     print('query all rows:');
+  //   }
+  //   for (var element in allRows) {
+  //     allStorageID.add(element["_id"]);
+  //     allStorageName.add(element["name"]);
+
+  //     categoryMap[element["_id"]] = element["name"];
+  //   }
+  //   setState(() {});
+  // }
 }

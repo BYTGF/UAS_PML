@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:uts/item/item_add.dart';
 import 'package:uts/item/item_edit.dart';
 
 import '/db_manager.dart';
 import '/colors.dart';
+import 'package:http/http.dart' as http;
 
 class ItemList extends StatefulWidget {
   const ItemList({Key? key}) : super(key: key);
@@ -14,7 +17,7 @@ class ItemList extends StatefulWidget {
 
 class _ItemListState extends State<ItemList> {
   final dbHelper = DatabaseHelper.instance;
-  List<Map<String, dynamic>> allItemData = [];
+  List<dynamic>  allItemData = [];
 
   Icon _getLeadingIcon(int qty) {
     if (qty > 5) {
@@ -102,7 +105,7 @@ class _ItemListState extends State<ItemList> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Quantity : ${item['itemQty']}'),
-                            duration: const Duration(seconds: 3),
+                            duration: const Duration(seconds: 1),
                           ),
                         );
                       },
@@ -136,18 +139,42 @@ class _ItemListState extends State<ItemList> {
     );
   }
 
-  void _query() async {
-    final allRows = await dbHelper.queryAllRowsItem();
-    print('query all rows:');
-    // allRows.forEach(print);
+  Future<void> _query() async {
+    await dbHelper.ambilData();
     setState(() {
-      allItemData = allRows;
+      allItemData = dbHelper.getItems();
+      
     });
+    ;
   }
 
-  void _delete(int id) async {
-    final rowsDeleted = await dbHelper.deleteItem(id);
-    print('deleted $rowsDeleted row(s): row $id');
-    _query();
+  void _delete(int id) async{
+    String idStorage = id.toString();
+    var requestBody = {'storageId': idStorage};
+
+    var url = 'https://apiuaspml.000webhostapp.com/data_delete.php';
+    var uri = Uri.parse(url);
+    var response = await http.post(uri, body: requestBody);
+    var body = response.body;
+    var json = jsonDecode(body);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
+    if (json['success'] == 1) {
+      _query();
+    }
   }
+  // void _query() async {
+  //   final allRows = await dbHelper.queryAllRowsItem();
+  //   print('query all rows:');
+  //   // allRows.forEach(print);
+  //   setState(() {
+  //     allItemData = allRows;
+  //   });
+  // }
+
+  // void _delete(int id) async {
+  //   final rowsDeleted = await dbHelper.deleteItem(id);
+  //   print('deleted $rowsDeleted row(s): row $id');
+  //   _query();
+  // }
 }
