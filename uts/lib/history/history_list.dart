@@ -110,7 +110,7 @@ class _HistoryListState extends State<HistoryList> {
               },
             );
           },
-          backgroundColor: Colors.amber,
+          backgroundColor: Colors.pink,
           child: Icon(Icons.add),
         ),
       ),
