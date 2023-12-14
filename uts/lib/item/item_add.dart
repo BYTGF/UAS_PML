@@ -23,7 +23,10 @@ class _AddItemState extends State<AddItem> {
   final TextEditingController _itemQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
   late int currentStorage;
+  late int currentSupplier;
+  bool _isMounted = false;
   List<dynamic> allStorageData = [];
+  List<dynamic> allSupplierData = [];
   int getFirstStorageId() {
     if (allStorageData.isNotEmpty) {
       // Access the first item and get its 'id'
@@ -35,13 +38,33 @@ class _AddItemState extends State<AddItem> {
       return 0; // or any default value
     }
   }
+
+  int getFirstSupplierId() {
+    if (allSupplierData.isNotEmpty) {
+      // Access the first item and get its 'id'
+      dynamic firstSupplier = allSupplierData[0];
+      int firstSupplierId = firstSupplier['supplier_id'];
+      return firstSupplierId;
+    } else {
+      // Handle the case when the list is empty
+      return 0; // or any default value
+    }
+  }
   final dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
+    _isMounted = true;
     _queryStorage();
     currentStorage = getFirstStorageId();
+    currentSupplier = getFirstSupplierId();
+  }
+
+  @override
+  void dispose() {
+    _isMounted = false;
+    super.dispose();
   }
 
   @override
@@ -147,6 +170,33 @@ class _AddItemState extends State<AddItem> {
                   ),
                   const SizedBox(
                     height: 20,
+                  ),Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: MyColors.primaryColor),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          isExpanded: true,
+                          items: allSupplierData.map((data) {
+                            int id = data["supplier_id"];
+                            String name = data["supplier_name"];
+                            return DropdownMenuItem<int>(
+                              value: id,
+                              child: Text(name),
+                            );
+                          }).toList(),
+                          onChanged: (selectedID) {
+                            setState(() {
+                              currentSupplier = int.parse(selectedID.toString());
+                            });
+                          },
+                          hint: Text("Select Supplier"),
+                          value: currentSupplier != null && allSupplierData.any((data) => data["supplier_id"] == currentSupplier) ? currentSupplier : null,
+                        ),
+                      )),
+                      const SizedBox(
+                    height: 20,
                   ),
                   TextButtonTheme(
                     data: TextButtonThemeData(
@@ -180,11 +230,10 @@ class _AddItemState extends State<AddItem> {
     await dbHelper.ambilData();
     setState(() {
       allStorageData = dbHelper.getStorages();
+      allSupplierData = dbHelper.getSuppliers();
     });
     print(allStorageData);
-    print(getFirstStorageId());
-    print(currentStorage);
-    
+    print(allSupplierData);
   }
   void _insert() async{
     String itemName = _itemName.text;
@@ -194,6 +243,7 @@ class _AddItemState extends State<AddItem> {
       'itemName': itemName,
       'storageId': currentStorage.toString(), // Keep it as an int
       'itemQty': itemQty,
+      'supplierId': currentSupplier.toString(), 
     };
 
     print(currentStorage.toString());
@@ -208,11 +258,12 @@ class _AddItemState extends State<AddItem> {
 
     var json = jsonDecode(body);
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(json['message'])));
-        print("1");
-    if (json['success'] == 1) {
-      widget.insertCallback(); // Call the callback function from ItemList
+    if (_isMounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(json['message'])));
+    }
+
+    if (_isMounted && json['success'] == 1) {
+      widget.insertCallback();
       Navigator.of(context).pop();
     }
   }

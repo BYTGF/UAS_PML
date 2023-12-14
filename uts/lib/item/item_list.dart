@@ -79,9 +79,16 @@ class _ItemListState extends State<ItemList> {
                                 builder: (BuildContext context) {
                                   return Dialog(
                                     child: Container(
-                                      height: 400,
+                                      height: 500,
                                       child: Center(
-                                        child: EditItem(),
+                                        child: EditItem(
+                                          insertCallback: _insertCallback,
+                                          id: item['itemId'],
+                                          itemName: item['itemName'],
+                                          storageId: item['storageId'],
+                                          itemQty: item['itemQty'],
+                                          supplierId: item['supplierId'],
+                                        ),
                                       ),
                                     ),
                                   );
@@ -123,7 +130,7 @@ class _ItemListState extends State<ItemList> {
               builder: (BuildContext context) {
                 return Dialog(
                   child: Container(
-                    height: 400,
+                    height: 500,
                     child: Center(
                       child: AddItem(insertCallback: _insertCallback),
                     ),
@@ -149,17 +156,17 @@ class _ItemListState extends State<ItemList> {
   }
 
   void _delete(int id) async{
-    String idStorage = id.toString();
-    var requestBody = {'storageId': idStorage};
+    String idItem = id.toString();
+    var requestBody = {'itemId': idItem};
 
     var url = 'https://apiuaspml.000webhostapp.com/data_delete.php';
     var uri = Uri.parse(url);
     var response = await http.post(uri, body: requestBody);
     var body = response.body;
     var json = jsonDecode(body);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(json['message'])));
     if (json['success'] == 1) {
+      ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(json['message'])));
       _query();
     }
   }

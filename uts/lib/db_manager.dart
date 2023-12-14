@@ -29,6 +29,7 @@ class DatabaseHelper {
 
   List<dynamic>  users = []; // Store fetched data here
   List<dynamic>  storages = [];
+  List<dynamic>  suppliers = [];
   List<dynamic>  items = [];
   List<dynamic>  histories = [];
 
@@ -41,6 +42,7 @@ class DatabaseHelper {
       var body = response.body;
       var json = jsonDecode(body);
       users =json['users']['usersData']['users'];
+      suppliers =json['suppliers']['suppliersData']['suppliers'];
       storages =json['storages']['storagesData']['storages'];
       items =json['items']['itemsData']['items'];
       histories =json['histories']['historiesData']['histories'];
@@ -51,6 +53,10 @@ class DatabaseHelper {
 
   List<dynamic>  getUsers() {
     return users;
+  }
+
+  List<dynamic>  getSuppliers() {
+    return suppliers;
   }
 
   List<dynamic>  getStorages() {

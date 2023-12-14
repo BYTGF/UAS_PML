@@ -21,6 +21,11 @@ class _StorageListState extends State<StorageList> {
   List<dynamic>  allStorageData = [];
   TextEditingController _StorageName = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
+
+  void _insertCallback() {
+    _query(); // Refresh the list after insertion
+  }
+  
   @override
   void initState() {
     super.initState();
@@ -131,8 +136,9 @@ class _StorageListState extends State<StorageList> {
                                                 height: 400,
                                                 child: Center(
                                                   child: EditStorage(
+                                                    insertCallback: _insertCallback,
                                                     id: item['storage_id'],
-                                                    name: item['name'],
+                                                    storageName: item['name'],
                                                   ),
                                                 )));
                                       },

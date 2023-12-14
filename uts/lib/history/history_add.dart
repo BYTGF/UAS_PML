@@ -24,9 +24,13 @@ class AddHistory extends StatefulWidget {
 
 class _AddHistoryState extends State<AddHistory> {
   int? selectedStatus;
+  late int currentSupplier;
+  bool _isMounted = false;
   final TextEditingController _historyQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
   late int currentItem;
+  late int currentItemQty;
+  late int totalQty;
   int getFirstItemId() {
     if (allItemData.isNotEmpty) {
       // Access the first item and get its 'id'
@@ -39,6 +43,18 @@ class _AddHistoryState extends State<AddHistory> {
     }
   }
   List<dynamic> allItemData = [];
+  List<dynamic> allSupplierData = [];
+  int getFirstSupplierId() {
+    if (allSupplierData.isNotEmpty) {
+      // Access the first item and get its 'id'
+      dynamic firstSupplier = allSupplierData[0];
+      int firstSupplierId = firstSupplier['supplier_id'];
+      return firstSupplierId;
+    } else {
+      // Handle the case when the list is empty
+      return 0; // or any default value
+    }
+  }
   final dbHelper = DatabaseHelper.instance;
 
 // INITIALIZE. RESULT IS A WIDGET, SO IT CAN BE DIRECTLY USED IN BUILD METHOD
@@ -46,8 +62,16 @@ class _AddHistoryState extends State<AddHistory> {
   @override
   void initState() {
     super.initState();
+    _isMounted = true;
     _query();
     currentItem = getFirstItemId();
+    currentSupplier = getFirstSupplierId();
+  }
+
+  @override
+  void dispose() {
+    _isMounted = false;
+    super.dispose();
   }
 
   @override
@@ -91,6 +115,11 @@ class _AddHistoryState extends State<AddHistory> {
                           onChanged: (selectedID) {
                             setState(() {
                               currentItem = int.parse(selectedID.toString());
+                              // Find the selected item's data in allItemData
+                              Map<String, dynamic> selectedData = allItemData.firstWhere((data) => data["itemId"] == currentItem);
+
+                              // Extract itemQty and assign it to currentItemQty
+                              currentItemQty = selectedData["itemQty"];
                             });
                           },
                             hint: Text("Select Item"),
@@ -158,6 +187,35 @@ class _AddHistoryState extends State<AddHistory> {
                       const SizedBox(
                         height: 20,
                       ),
+                      if (selectedStatus == 1)
+                      Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: MyColors.primaryColor),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          isExpanded: true,
+                          items: allSupplierData.map((data) {
+                            int id = data["supplier_id"];
+                            String name = data["supplier_name"];
+                            return DropdownMenuItem<int>(
+                              value: id,
+                              child: Text(name),
+                            );
+                          }).toList(),
+                          onChanged: (selectedID) {
+                            setState(() {
+                              currentSupplier = int.parse(selectedID.toString());
+                            });
+                          },
+                          hint: Text("Select Supplier"),
+                          value: currentSupplier != null && allSupplierData.any((data) => data["supplier_id"] == currentSupplier) ? currentSupplier : 0,
+                        ),
+                      )),
+                      const SizedBox(
+                    height: 20,
+                  ),
                       TextButtonTheme(
                         data: TextButtonThemeData(
                           style: ButtonStyle(
@@ -189,17 +247,28 @@ class _AddHistoryState extends State<AddHistory> {
 
   Future<void> _query() async {
     await dbHelper.ambilData();
+    if (_isMounted) {
     setState(() {
       allItemData = dbHelper.getItems();
+      allSupplierData = dbHelper.getSuppliers();
     });
-    ;
+  }
   }
   void _insert() async{
+
+    if (selectedStatus == 1) {
+      totalQty = currentItemQty + int.parse(_historyQty.text);
+    }else{
+      totalQty = currentItemQty - int.parse(_historyQty.text);
+      currentSupplier = 0;
+    }
 
     var requestBody = {
       'itemId': currentItem.toString(),
       'historyStatus': selectedStatus.toString(), // Keep it as an int
-      'historyQty': _historyQty.text,
+      'historyQty': _historyQty.text.toString(),
+      'supplierId': currentSupplier.toString(),
+      'updateItemQty' : totalQty.toString()
     };
 
     print(requestBody);
@@ -212,11 +281,12 @@ class _AddHistoryState extends State<AddHistory> {
 
     var json = jsonDecode(body);
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(json['message'])));
-        print("1");
-    if (json['success'] == 1) {
-      widget.insertCallback(); // Call the callback function from ItemList
+    if (_isMounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(json['message'])));
+    }
+
+    if (_isMounted && json['success'] == 1) {
+      widget.insertCallback();
       Navigator.of(context).pop();
     }
   }

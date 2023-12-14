@@ -87,7 +87,7 @@ class _HistoryListState extends State<HistoryList> {
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Quantity : ${item['historyQty']}'),
+                            content: Text('Transaction Date : ${item['historyDate']}'),
                             duration: const Duration(seconds: 1),
                           ),
                         );
@@ -106,7 +106,7 @@ class _HistoryListState extends State<HistoryList> {
               builder: (BuildContext context) {
                 return Dialog(
                   child: Container(
-                    height: 400,
+                    height: 500,
                     child: Center(
                       child: AddHistory(insertCallback: _insertCallback),
                     ),

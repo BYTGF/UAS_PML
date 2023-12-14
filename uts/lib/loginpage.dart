@@ -27,6 +27,9 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data['status'] == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'])),
+        );
         // Navigate to the home page upon successful login
         Navigator.pushNamed(context, '/home');
       } else {
@@ -59,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 64),
               Column(
                 children: [
-                  Text("username"),
+                  Text("Username"),
                   const SizedBox(height: 10),
                   Container(
                     width: double.infinity,
@@ -71,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                       controller: usernameController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: "kelompokgg@gmail.com",
+                        hintText: "Input Username",
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 16, vertical: 17),
                       ),
