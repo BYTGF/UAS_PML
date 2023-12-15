@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'
-    as http; // Import the HTTP package for making requests
+    as http;
+import 'package:uts/statvar.dart'; // Import the HTTP package for making requests
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -14,37 +15,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passController = TextEditingController();
-
-  Future<void> loginUser(BuildContext context) async {
-    final response = await http.post(
-      Uri.parse('https://apiuaspml.000webhostapp.com/authentication_login.php'),
-      body: {
-        'username': usernameController.text,
-        'pass': passController.text,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'])),
-        );
-        // Navigate to the home page upon successful login
-        Navigator.pushNamed(context, '/home');
-      } else {
-        // Display an error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'])),
-        );
-      }
-    } else {
-      // Handle errors
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error connecting to the server')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,5 +94,37 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<void> loginUser(BuildContext context) async {
+    final response = await http.post(
+      Uri.parse('https://apiuaspml.000webhostapp.com/authentication_login.php'),
+      body: {
+        'username': usernameController.text,
+        'pass': passController.text,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['status'] == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'])),
+        );
+        // Navigate to the home page upon successful login
+        StatVar.userData = data['user'];
+        Navigator.pushNamed(context, '/home');
+      } else {
+        // Display an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'])),
+        );
+      }
+    } else {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error connecting to the server')),
+      );
+    }
   }
 }

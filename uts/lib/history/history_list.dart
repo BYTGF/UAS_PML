@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uts/history/history_add.dart';
+import 'package:uts/statvar.dart';
 
 import '/db_manager.dart';
 import '/colors.dart';
@@ -32,6 +33,7 @@ class _HistoryListState extends State<HistoryList> {
   @override
   void initState() {
     super.initState();
+    StatVar.accessUserData(); 
     _query();
   }
 

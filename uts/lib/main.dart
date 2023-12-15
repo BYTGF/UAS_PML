@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:uts/homepage.dart';
 import 'package:uts/loginpage.dart';
+import 'package:uts/storage/storage_edit.dart';
+import 'package:uts/storage/storage_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +26,8 @@ class MyApp extends StatelessWidget {
           return LoginPage(); 
         },
         '/home': (context) { 
-          return HomePage(); }
+          return HomePage(); 
+        },
       },
     );
   }

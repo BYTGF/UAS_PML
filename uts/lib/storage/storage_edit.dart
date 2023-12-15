@@ -51,7 +51,7 @@ class _EditStorageState extends State<EditStorage> {
         appBar: AppBar(
           backgroundColor: MyColors.primaryColor,
           centerTitle: true,
-          title: Text("Add Item"),
+          title: Text("Edit Storage"),
         ),
         body: Form(
           key: formGlobalKey,

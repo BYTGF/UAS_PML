@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uts/item/item_add.dart';
 import 'package:uts/item/item_edit.dart';
+import 'package:uts/statvar.dart';
 
 import '/db_manager.dart';
 import '/colors.dart';
@@ -37,6 +38,7 @@ class _ItemListState extends State<ItemList> {
   @override
   void initState() {
     super.initState();
+    StatVar.accessUserData(); 
     _query();
   }
 
@@ -67,6 +69,7 @@ class _ItemListState extends State<ItemList> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
+                          if (StatVar.access == 1)
                           IconButton(
                             icon: Icon(
                               Icons.edit_note,
@@ -96,6 +99,7 @@ class _ItemListState extends State<ItemList> {
                               );
                             },
                           ),
+                          if (StatVar.access == 1)
                           IconButton(
                             icon: Icon(
                               Icons.delete_outline,

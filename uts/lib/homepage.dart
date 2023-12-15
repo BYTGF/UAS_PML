@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:uts/colors.dart';
 import 'package:uts/history/history_list.dart';
 import 'package:uts/item/item_list.dart';
+import 'package:uts/statvar.dart';
 import 'package:uts/storage/storage_list.dart';
-import 'package:uts/user/user_list.dart';
+import 'package:uts/supplier/supplier_list.dart';
 import 'db_manager.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,11 +21,13 @@ class _HomePageState extends State<HomePage>
   final dbHelper = DatabaseHelper.instance;
   final formGlobalKey = GlobalKey<FormState>();
   late TabController _tabController;
+  
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    StatVar.accessUserData(); 
   }
 
   @override
@@ -37,18 +40,14 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: MyColors.primaryColor,
-          centerTitle: true,
-          title: Text("Office Stationary Stock Monitoring"),
-        ),
+        appBar: CustomAppBar(),
         body: TabBarView(
           controller: _tabController,
           children: [
             HistoryList(),
             ItemList(),
             StorageList(),
-            UserList(),
+            SupplierList(),
           ],
         ),
         bottomNavigationBar: Container(
@@ -71,7 +70,7 @@ class _HomePageState extends State<HomePage>
                 icon: Icon(Icons.storage),
               ),
               Tab(
-                text: 'User',
+                text: 'Supplier',
                 icon: Icon(Icons.account_circle),
               ),
             ],
@@ -80,4 +79,35 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
+  
 }
+
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: MyColors.primaryColor,
+      centerTitle: true,
+      title: Text("Welcome, ${StatVar.userName}"),
+      automaticallyImplyLeading: false, // Removes the back button
+      actions: [
+        IconButton(
+          icon: Icon(Icons.logout),
+          onPressed: () {
+            // Reset user data and navigate to the login page
+            StatVar.userData = null;
+            StatVar.userName = null.toString();
+            StatVar.access = 0;
+
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/login', (route) => false);
+          },
+        ),
+      ],
+    );
+  }
+}
+

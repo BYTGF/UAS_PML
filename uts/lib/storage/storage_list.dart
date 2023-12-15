@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:uts/colors.dart';
+import 'package:uts/statvar.dart';
 import 'package:uts/storage/storage_edit.dart';
 
 import '/db_manager.dart';
@@ -29,6 +30,7 @@ class _StorageListState extends State<StorageList> {
   @override
   void initState() {
     super.initState();
+    StatVar.accessUserData(); 
     _query();
   }
 
@@ -121,6 +123,7 @@ class _StorageListState extends State<StorageList> {
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
+                                if (StatVar.access == 1)
                                 IconButton(
                                   icon: Icon(
                                     Icons.edit_note,
@@ -145,6 +148,7 @@ class _StorageListState extends State<StorageList> {
                                     );
                                   },
                                 ),
+                                if (StatVar.access == 1)
                                 IconButton(
                                   icon: Icon(
                                     Icons.delete_outline,

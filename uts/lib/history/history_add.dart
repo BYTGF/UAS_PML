@@ -114,12 +114,12 @@ class _AddHistoryState extends State<AddHistory> {
                           }).toList(),
                           onChanged: (selectedID) {
                             setState(() {
-                              currentItem = int.parse(selectedID.toString());
                               // Find the selected item's data in allItemData
                               Map<String, dynamic> selectedData = allItemData.firstWhere((data) => data["itemId"] == currentItem);
 
                               // Extract itemQty and assign it to currentItemQty
                               currentItemQty = selectedData["itemQty"];
+                              currentItem = int.parse(selectedID.toString());
                             });
                           },
                             hint: Text("Select Item"),
