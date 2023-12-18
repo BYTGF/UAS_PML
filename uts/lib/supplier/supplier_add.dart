@@ -20,7 +20,10 @@ class AddSupplier extends StatefulWidget {
 
 class _AddSupplierState extends State<AddSupplier> {
   final TextEditingController _SupplierName = TextEditingController();
+  final TextEditingController _ContactPerson = TextEditingController();
+  final TextEditingController _Email = TextEditingController();
   final TextEditingController _PhoneNumber = TextEditingController();
+  final TextEditingController _Address = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
   bool _isMounted = false;
   final dbHelper = DatabaseHelper.instance;
@@ -99,24 +102,108 @@ class _AddSupplierState extends State<AddSupplier> {
                         borderSide: BorderSide(
                             color: MyColors.primaryColor, width: 1.0),
                       ),
-                      hintText: 'Supplier Quantity',
+                      hintText: 'Phone Number',
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     ),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Enter Quantity';
+                        return 'Enter PhoneNumber';
                       }
                       return null;
                     },
                     controller: _PhoneNumber,
                   ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            BorderSide(color: Colors.greenAccent, width: 2.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: MyColors.primaryColor, width: 1.0),
+                      ),
+                      hintText: 'Contact Person',
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter Contact Person';
+                      }
+                      return null;
+                    },
+                    controller: _ContactPerson,
+                  ),
+                  //textformfield en
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            BorderSide(color: Colors.greenAccent, width: 2.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: MyColors.primaryColor, width: 1.0),
+                      ),
+                      hintText: 'Email',
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter Email';
+                      }
+                      return null;
+                    },
+                    controller: _Email,
+                  ),
+                  //textformfield en
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            BorderSide(color: Colors.greenAccent, width: 2.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: MyColors.primaryColor, width: 1.0),
+                      ),
+                      hintText: 'Address',
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter Address';
+                      }
+                      return null;
+                    },
+                    controller: _Address,
+                  ),
+                  //textformfield en
                   const SizedBox(
                     height: 20,
                   ),
                   //mulai bikin disini
-                  
+
                   //mulai bikin akhir disini
                   TextButtonTheme(
                     data: TextButtonThemeData(
@@ -145,10 +232,14 @@ class _AddSupplierState extends State<AddSupplier> {
       ),
     );
   }
-  void _insert() async{
 
+  void _insert() async {
     var requestBody = {
-      'SupplierName': _SupplierName.text,
+      'supplierName': _SupplierName.text,
+      'contactPerson': _ContactPerson.text,
+      'email': _Email.text,
+      'phoneNumber': _PhoneNumber.text,
+      'address': _Address.text,
     };
 
     print(requestBody);
@@ -162,7 +253,8 @@ class _AddSupplierState extends State<AddSupplier> {
     var json = jsonDecode(body);
 
     if (_isMounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(json['message'])));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(json['message'])));
     }
 
     if (_isMounted && json['success'] == 1) {

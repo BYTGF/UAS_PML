@@ -18,7 +18,7 @@ class SupplierList extends StatefulWidget {
 
 class _SupplierListState extends State<SupplierList> {
   final dbHelper = DatabaseHelper.instance;
-  List<dynamic>  allSupplierData = [];
+  List<dynamic> allSupplierData = [];
 
   void _insertCallback() {
     _query(); // Refresh the list after insertion
@@ -27,7 +27,7 @@ class _SupplierListState extends State<SupplierList> {
   @override
   void initState() {
     super.initState();
-    StatVar.accessUserData(); 
+    StatVar.accessUserData();
     _query();
   }
 
@@ -61,55 +61,63 @@ class _SupplierListState extends State<SupplierList> {
         child: ListTile(
                       leading: Icon(Icons.account_box),
                       title: Text("${supplier['supplier_name']}"),
-                      subtitle: 
-                      Column(
+                      subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                        Text("${supplier['contact_person']} | ${supplier['phone_number']}"),
-                        Text("${supplier['address']}"),
+                          Text(
+                              "${supplier['contact_person']} | ${supplier['phone_number']}"),
+                          Text("${supplier['address']}"),
                         ],
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           if (StatVar.access == 1)
-                          IconButton(
-                            icon: Icon(
-                              Icons.edit_note,
-                              size: 20.0,
-                              color: Colors.brown[900],
-                            ),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Dialog(
-                                    child: Container(
-                                      height: 500,
-                                      child: Center(
-                                        child: EditSupplier(
-                                          insertCallback: _insertCallback,
-                                          id: supplier['supplier_id'],
-                                          SupplierName: supplier['supplier_name'],
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit_note,
+                                size: 20.0,
+                                color: Colors.brown[900],
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Dialog(
+                                      child: Container(
+                                        height: 500,
+                                        child: Center(
+                                          child: EditSupplier(
+                                            insertCallback: _insertCallback,
+                                            id: supplier['supplier_id'],
+                                            supplierName: supplier['supplier_name'],
+                                            contactPerson:
+                                            supplier['contact_person'],
+                                            email:
+                                            supplier['email'],
+                                            phoneNumber:
+                                            supplier['phone_number'],
+                                            address:
+                                            supplier['address'],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                          if (StatVar.access == 1)
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete_outline,
-                              size: 20.0,
-                              color: Colors.brown[900],
+                                    );
+                                  },
+                                );
+                              },
                             ),
-                            onPressed: () {
-                              _delete(supplier['supplier_id']);
-                            },
-                          ),
+                          if (StatVar.access == 1)
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                size: 20.0,
+                                color: Colors.brown[900],
+                              ),
+                              onPressed: () {
+                                _delete(supplier['supplier_id']);
+                              },
+                            ),
                         ],
                       ),
                       onTap: () {
@@ -135,7 +143,7 @@ class _SupplierListState extends State<SupplierList> {
               builder: (BuildContext context) {
                 return Dialog(
                   child: Container(
-                    height: 500,
+                    height: 650,
                     child: Center(
                       child: AddSupplier(insertCallback: _insertCallback),
                     ),
@@ -155,12 +163,11 @@ class _SupplierListState extends State<SupplierList> {
     await dbHelper.ambilData();
     setState(() {
       allSupplierData = dbHelper.getSuppliers();
-      
     });
     ;
   }
 
-  void _delete(int id) async{
+  void _delete(int id) async {
     String idSupplier = id.toString();
     var requestBody = {'SupplierId': idSupplier};
 
@@ -171,7 +178,7 @@ class _SupplierListState extends State<SupplierList> {
     var json = jsonDecode(body);
     if (json['success'] == 1) {
       ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(json['message'])));
+          .showSnackBar(SnackBar(content: Text(json['message'])));
       _query();
     }
   }
