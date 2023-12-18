@@ -29,7 +29,7 @@ class _AddHistoryState extends State<AddHistory> {
   final TextEditingController _historyQty = TextEditingController();
   final formGlobalKey = GlobalKey<FormState>();
   late int currentItem;
-  late int currentItemQty;
+  late int currentItemQty = 0;
   late int totalQty;
   int getFirstItemId() {
     if (allItemData.isNotEmpty) {
@@ -114,16 +114,21 @@ class _AddHistoryState extends State<AddHistory> {
                           }).toList(),
                           onChanged: (selectedID) {
                             setState(() {
-                              // Find the selected item's data in allItemData
-                              Map<String, dynamic> selectedData = allItemData.firstWhere((data) => data["itemId"] == currentItem);
+                               try {
+      // Find the selected item's data in allItemData
+      var selectedItem = allItemData.firstWhere((data) => data["itemId"] == currentItem, orElse: () => null);
 
-                              // Extract itemQty and assign it to currentItemQty
-                              currentItemQty = selectedData["itemQty"];
-                              currentItem = int.parse(selectedID.toString());
+      // If the element is found, extract itemQty and assign it to currentItemQty
+      // Otherwise, set a default value (e.g., 0)
+      currentItemQty = selectedItem != null ? selectedItem["itemQty"] : 0;
+      currentItem = int.parse(selectedID.toString());
+    } catch (error) {
+      print('Error in onChanged callback: $error');
+    }
                             });
                           },
                             hint: Text("Select Item"),
-                            value: currentItem != null && allItemData.any((data) => data["Item_id"] == currentItem) ? currentItem : null,
+                            value: currentItem != null && allItemData.any((data) => data["itemId"] == currentItem) ? currentItem : null,
                           ),
                         )
                       ),
@@ -210,7 +215,7 @@ class _AddHistoryState extends State<AddHistory> {
                             });
                           },
                           hint: Text("Select Supplier"),
-                          value: currentSupplier != null && allSupplierData.any((data) => data["supplier_id"] == currentSupplier) ? currentSupplier : 0,
+                          value: currentSupplier != null && allSupplierData.any((data) => data["supplierId"] == currentSupplier) ? currentSupplier : 0,
                         ),
                       )),
                       const SizedBox(
@@ -248,11 +253,13 @@ class _AddHistoryState extends State<AddHistory> {
   Future<void> _query() async {
     await dbHelper.ambilData();
     if (_isMounted) {
-    setState(() {
-      allItemData = dbHelper.getItems();
-      allSupplierData = dbHelper.getSuppliers();
-    });
-  }
+      setState(() {
+        allItemData = dbHelper.getItems();
+        allSupplierData = dbHelper.getSuppliers();
+      });
+
+      print(allItemData);
+    }
   }
   void _insert() async{
 

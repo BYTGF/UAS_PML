@@ -169,16 +169,19 @@ class _SupplierListState extends State<SupplierList> {
 
   void _delete(int id) async {
     String idSupplier = id.toString();
-    var requestBody = {'SupplierId': idSupplier};
+    var requestBody = {'supplierId': idSupplier};
 
     var url = 'https://apiuaspml.000webhostapp.com/data_delete.php';
     var uri = Uri.parse(url);
+    print("1");
     var response = await http.post(uri, body: requestBody);
+    print("2");
     var body = response.body;
+    print("3");
     var json = jsonDecode(body);
+    print("4");
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(json['message'])));
     if (json['success'] == 1) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(json['message'])));
       _query();
     }
   }
