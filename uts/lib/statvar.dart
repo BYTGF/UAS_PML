@@ -13,7 +13,6 @@ class StatVar {
       access = 0;
       userName = '';
     }
-    // Now you can use the 'access' variable safely
-    print('Access level: $access');
+  
   }
 }

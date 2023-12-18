@@ -19,10 +19,10 @@ class _HistoryListState extends State<HistoryList> {
 
   Icon _getLeadingIcon(int status) {
     if (status == 1) {
-      return Icon(Icons.check_circle);
+      return Icon(Icons.check_circle, color: Colors.greenAccent);
     } else {
       return Icon(
-          Icons.warning); // Replace with another icon for negative quantity
+          Icons.warning, color: Colors.redAccent); // Replace with another icon for negative quantity
     }
   }
 
@@ -57,7 +57,13 @@ class _HistoryListState extends State<HistoryList> {
                   },
                   itemBuilder: (_, index) {
                     var item = allHistoryData[index];
-                    return ListTile(
+                    return Card(
+        elevation: 4.0, // Adjust the elevation as needed
+        margin: EdgeInsets.all(8.0), // Adjust the margin as needed
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0), // Adjust the border radius as needed
+        ),
+        child: ListTile(
                       leading: _getLeadingIcon(item['historyStatus']),
                       title: Text("${item['itemName']}"),
                       subtitle: Text("${item['historyQty']}"),
@@ -94,7 +100,7 @@ class _HistoryListState extends State<HistoryList> {
                           ),
                         );
                       },
-                    );
+                    ));
                   },
                 ),
               ),
@@ -130,13 +136,7 @@ Future<void> _query() async {
       allHistoryData = dbHelper.getHistories();
     });
   }
-  void _update() async{
 
-  }
-
-  void _delete() async{
-    
-  }
   // void _query() async {
   //   final allRows = await dbHelper.queryAllRowsHistory();
   //   print('query all rows:');

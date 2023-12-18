@@ -51,7 +51,14 @@ class _SupplierListState extends State<SupplierList> {
                   },
                   itemBuilder: (_, index) {
                     var supplier = allSupplierData[index];
-                    return ListTile(
+                    return
+                    Card(
+        elevation: 4.0, // Adjust the elevation as needed
+        margin: EdgeInsets.all(8.0), // Adjust the margin as needed
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0), // Adjust the border radius as needed
+        ),
+        child: ListTile(
                       leading: Icon(Icons.account_box),
                       title: Text("${supplier['supplier_name']}"),
                       subtitle: 
@@ -113,6 +120,7 @@ class _SupplierListState extends State<SupplierList> {
                           ),
                         );
                       },
+                    )
                     );
                   },
                 ),

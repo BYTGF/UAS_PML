@@ -21,13 +21,13 @@ class _ItemListState extends State<ItemList> {
   List<dynamic>  allItemData = [];
 
   Icon _getLeadingIcon(int qty) {
-    if (qty > 5) {
-      return Icon(Icons.checklist_rounded);
+    if (qty > 10) {
+      return Icon(Icons.checklist_rounded, color: Colors.greenAccent);
     } else if (qty == 0) {
-      return Icon(Icons.error); // Replace with your desired icon
+      return Icon(Icons.error, color: Colors.redAccent); // Replace with your desired icon
     } else {
       return Icon(
-          Icons.warning); // Replace with another icon for negative quantity
+          Icons.warning, color: Colors.yellowAccent); // Replace with another icon for negative quantity
     }
   }
 
@@ -62,7 +62,13 @@ class _ItemListState extends State<ItemList> {
                   },
                   itemBuilder: (_, index) {
                     var item = allItemData[index];
-                    return ListTile(
+                    return Card(
+        elevation: 4.0, // Adjust the elevation as needed
+        margin: EdgeInsets.all(8.0), // Adjust the margin as needed
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0), // Adjust the border radius as needed
+        ),
+        child:  ListTile(
                       leading: _getLeadingIcon(item['itemQty']),
                       title: Text("${item['itemName']}"),
                       subtitle: Text("${item['storageName']}"),
@@ -120,7 +126,7 @@ class _ItemListState extends State<ItemList> {
                           ),
                         );
                       },
-                    );
+                    ));
                   },
                 ),
               ),

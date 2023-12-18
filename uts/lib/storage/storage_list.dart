@@ -117,7 +117,13 @@ class _StorageListState extends State<StorageList> {
                         },
                         itemBuilder: (_, index) {
                           var item = allStorageData[index];
-                          return ListTile(
+                          return Card(
+        elevation: 4.0, // Adjust the elevation as needed
+        margin: EdgeInsets.all(8.0), // Adjust the margin as needed
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0), // Adjust the border radius as needed
+        ),
+        child: ListTile(
                             leading: Icon(Icons.account_circle),
                             title: Text("${item['name']}"),
                             trailing: Row(
@@ -164,7 +170,7 @@ class _StorageListState extends State<StorageList> {
                             onTap: () {
                               // Add your onTap logic here
                             },
-                          );
+                          ));
                         },
                       ),
                     )
